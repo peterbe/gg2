@@ -1,19 +1,19 @@
-import { Command } from "commander";
+import { Command } from "commander"
 
-import { version } from "../package.json";
-import { commitBranch } from "./commit-branch";
-import { configureRepo } from "./configure-repo";
-import { error } from "./logger";
-import { repoConfig } from "./repo-config";
-import { startBranch } from "./start-branch";
+import { version } from "../package.json"
+import { commitBranch } from "./commit-branch"
+import { configureRepo } from "./configure-repo"
+import { error } from "./logger"
+import { repoConfig } from "./repo-config"
+import { startBranch } from "./start-branch"
 
-const program = new Command();
+const program = new Command()
 
 program
   .name("gg")
   .description("CLI to make it easier to manage git branches")
   //   .option("--debug", "Debug mode")
-  .version(version);
+  .version(version)
 
 program
   .command("start")
@@ -27,8 +27,8 @@ program
     //         process.exit(1);
     //     }
     // }
-    wrap(startBranch(url, options), options.debug);
-  });
+    wrap(startBranch(url, options), options.debug)
+  })
 
 program
   .command("commit")
@@ -37,9 +37,8 @@ program
   .option("--no-verify", "No git hook verify")
   .option("-y, --yes", "Push")
   .action((options) => {
-    console.log(options);
-    wrap(commitBranch(options), options.debug);
-  });
+    wrap(commitBranch(options), options.debug)
+  })
 
 program
   .command("configure")
@@ -47,34 +46,34 @@ program
   .option("--debug", "Debug mode (shows traceback)")
   // .option("-y, --yes", "Push")
   .action((options) => {
-    wrap(configureRepo(), options.debug);
-  });
+    wrap(configureRepo(), options.debug)
+  })
 
 program
   .command("config")
   .description("Prints the current repo config")
   .option("--debug", "Debug mode (shows traceback)")
   .action((options) => {
-    wrap(repoConfig(), options.debug);
-  });
+    wrap(repoConfig(), options.debug)
+  })
 
-program.parse();
+program.parse()
 
 function wrap(promise: Promise<void>, debug: boolean) {
   promise
     .then(() => {
-      process.exit(0);
+      process.exit(0)
     })
     .catch((err) => {
       if (err instanceof Error && err.name === "ExitPromptError") {
         // Ctrl-C
-        process.exit(0);
+        process.exit(0)
       }
 
       if (debug) {
-        throw err;
+        throw err
       }
-      error(err.message);
-      process.exit(1);
-    });
+      error(err.message)
+      process.exit(1)
+    })
 }
