@@ -1,23 +1,26 @@
 {
-	"name": "gg2",
-	"module": "index.ts",
-	"version": "0.0.1",
-	"type": "module",
-	"private": true,
-	"scripts": {
-		"lint": "biome format --write",
-		"build": "bun build src/index.ts --target=bun --outfile out/gg --compile"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.1.1",
-		"@types/bun": "latest"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
-	},
-	"dependencies": {
-		"@inquirer/prompts": "^7.6.0",
-		"commander": "^14.0.0",
-		"simple-git": "^3.28.0"
-	}
+  "name": "gg2",
+  "module": "index.ts",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "biome check --write --unsafe",
+    "build": "bun build src/index.ts --target=bun --outfile out/gg --compile",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.1",
+    "@types/bun": "latest",
+    "husky": "^9.1.7"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.6.0",
+    "commander": "^14.0.0",
+    "kleur": "^4.1.5",
+    "simple-git": "^3.28.0"
+  }
 }

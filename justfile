@@ -10,6 +10,13 @@ build:
 ship: build
     cp out/gg ~/bin/gg
 
+rapid-build:
+    bun build --watch src/index.ts --target=bun --outfile ~/bin/gg --compile
+
+linux-build:
+    bun build src/index.ts --target=bun --outfile ~/Desktop/gg-linux-x64-modern --compile --target=bun-linux-x64-modern
+    bun build src/index.ts --target=bun --outfile ~/Desktop/gg-linux-arm64 --compile --target=bun-linux-arm64
+
 # lint:
 #     bun run lint:check
 
