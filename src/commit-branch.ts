@@ -7,10 +7,10 @@ import { getTitle } from "./storage"
 
 type Options = {
   verify?: boolean
-  force?: boolean
+  yes?: boolean
 }
 export async function commitBranch(options: Options) {
-  const force = Boolean(options.force)
+  const yes = Boolean(options.yes)
   const noVerify = !options.verify
   const git = simpleGit()
   const branchSummary = await git.branch()
@@ -73,7 +73,7 @@ export async function commitBranch(options: Options) {
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   const originName = origin ? origin.name : "origin"
 
-  let pushToRemote = force
+  let pushToRemote = yes
   if (!pushToRemote && origin) {
     pushToRemote = await confirm({
       message: `Push to ${originName}:`,
@@ -110,11 +110,15 @@ export async function commitBranch(options: Options) {
       console.log("(⌘-click to open URLs)")
     }
   } catch (error) {
-    if (force) {
+    if (yes) {
       if (error instanceof Error) {
         console.log("ERROR", error)
         console.log("ERROR.NAME", error.name)
-        console.log("ERROR MESSAGE WAS", error.message)
+        console.log({ "ERROR MESSAGE WAS": error.message })
+        if (error.message.includes("nothing to commit, working tree clean")) {
+          await git.push("origin", currentBranch)
+          success(`Changes pushed to ${originName}/${currentBranch}`)
+        }
       }
     }
     throw error

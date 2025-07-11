@@ -36,7 +36,7 @@ program
   .description("Commit and push changes")
   .option("--debug", "Debug mode (shows traceback)")
   .option("--no-verify", "No git hook verify")
-  .option("-f, --force", "Force delete if you have to")
+  .option("-y, --yes", "Push")
   .action((options) => {
     wrap(commitBranch(options), options.debug)
   })
