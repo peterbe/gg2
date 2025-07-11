@@ -1,5 +1,6 @@
 import { checkbox, input } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
+import { getDefaultBranch } from "./branch-utils"
 import { getHumanAge } from "./human-age"
 import { success, warn } from "./logger"
 import { getTitle } from "./storage"
@@ -17,7 +18,7 @@ export async function commitBranch(options: Options) {
   const defaultBranch = await getDefaultBranch(git)
   if (defaultBranch === currentBranch) {
     throw new Error(
-      `You are on the default branch (${defaultBranch}). Please switch to a feature branch before committing.`,
+      `You are on the default branch (${defaultBranch}). Switch to a feature branch before committing.`,
     )
   }
 
@@ -69,7 +70,7 @@ export async function commitBranch(options: Options) {
   const remotes = await git.getRemotes(true) // true includes URLs
   const origin = remotes.find((remote) => remote.name === "origin")
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
-  const originName = originUrl
+  const originName = origin ? origin.name : "origin"
 
   let pushToRemote = Boolean(options.yes)
   if (!pushToRemote && origin) {
@@ -89,7 +90,6 @@ export async function commitBranch(options: Options) {
   }
 
   const unstagedFiles = await getUnstagedFiles(git)
-  console.log("unstagedFiles:", unstagedFiles)
   await git.add(unstagedFiles)
 
   await git.commit(title, noVerify ? ["--no-verify"] : undefined)
@@ -100,26 +100,46 @@ export async function commitBranch(options: Options) {
     success("Changes committed but not pushed.")
   }
   warn("Need to print URL for creating new gitHub pr")
+
+  // const config = await getRepoConfig();
+  const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
+  if (nwo) {
+    // https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+
+    success(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+    console.log("(⌘-click to open URLs)")
+  }
+}
+
+function getGitHubNWO(url: string): string | undefined {
+  // E.g. git@github.com:peterbe/admin-peterbecom.gi
+  // or https://github.com/peterbe/admin-peterbecom.git"
+  if (url.includes("github.com")) {
+    if (URL.canParse(url)) {
+      const parsed = new URL(url)
+      return parsed.pathname.replace(/\.git$/, "").slice(1)
+    }
+    if (url.includes("git@github.com:")) {
+      const second = url.split(":")[1]
+      if (second) {
+        return second.replace(/\.git$/, "")
+      }
+    } else {
+      throw new Error(`Not implemented (${url})`)
+    }
+  }
+  return url
 }
 
 async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
   const status = await git.status()
-  return status.not_added
+  return status.not_added.filter((file) => !file.endsWith("~"))
 }
 
 async function getUnstagedFiles(git: SimpleGit): Promise<string[]> {
   const status = await git.status()
   // console.log("Unstaged files:", status.staged);
   return status.modified
-}
-
-async function getDefaultBranch(git: SimpleGit) {
-  const branches = await git.branch(["-r"])
-  const defaultBranch = branches.all
-    .find((branch) => branch.includes("origin/HEAD -> origin/"))
-    ?.split("origin/HEAD -> origin/")[1]
-
-  return defaultBranch || "main"
 }
 
 async function printUnTrackedFiles(files: string[]) {

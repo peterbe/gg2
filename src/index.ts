@@ -3,6 +3,7 @@ import { Command } from "commander"
 import { version } from "../package.json"
 import { commitBranch } from "./commit-branch"
 import { configureRepo } from "./configure-repo"
+import { getBack } from "./get-back"
 import { error } from "./logger"
 import { repoConfig } from "./repo-config"
 import { startBranch } from "./start-branch"
@@ -55,6 +56,15 @@ program
   .option("--debug", "Debug mode (shows traceback)")
   .action((options) => {
     wrap(repoConfig(), options.debug)
+  })
+
+program
+  .command("getback")
+  .description("Go back to the default branch and delete this one")
+  .option("--debug", "Debug mode (shows traceback)")
+  .option("-f, --force", "Force delete if you have to")
+  .action((options) => {
+    wrap(getBack(options), options.debug)
   })
 
 program.parse()
