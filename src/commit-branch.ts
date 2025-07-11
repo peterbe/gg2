@@ -1,4 +1,4 @@
-import { checkbox, input } from "@inquirer/prompts"
+import { checkbox, confirm, input } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { getHumanAge } from "./human-age"
@@ -27,16 +27,16 @@ export async function commitBranch(options: Options) {
     warn("\nUntracked files:")
     await printUnTrackedFiles(untrackedFiles)
     console.log("")
-    const confirm = await input({
+    const confirmed = await input({
       message: "Do you want to add these untracked files? [y/n/i]",
     })
-    if (confirm.toLowerCase() === "n") {
+    if (confirmed.toLowerCase() === "n") {
       // throw new Error(
       //   "Untracked files found. Please add them before committing."
       // );
-    } else if (confirm.toLowerCase() === "y") {
+    } else if (confirmed.toLowerCase() === "y") {
       await git.add(untrackedFiles)
-    } else if (confirm.toLowerCase() === "i") {
+    } else if (confirmed.toLowerCase() === "i") {
       // Interactive
       const choices: { name: string; value: string }[] = []
       for (const name of untrackedFiles) {
@@ -74,19 +74,20 @@ export async function commitBranch(options: Options) {
 
   let pushToRemote = Boolean(options.yes)
   if (!pushToRemote && origin) {
-    const askedPushToRemote = await input({
-      message: `Push to ${originName}: [Y/n]`,
+    pushToRemote = await confirm({
+      message: `Push to ${originName}:`,
+      default: true,
     })
-    if (askedPushToRemote.toLowerCase() === "n") {
-      pushToRemote = false
-    } else if (
-      askedPushToRemote === "" ||
-      askedPushToRemote.toLowerCase() === "y"
-    ) {
-      pushToRemote = true
-    } else {
-      throw new Error("Invalid input. Please enter 'Y' or 'n'.")
-    }
+    // if (askedPushToRemote.toLowerCase() === "n") {
+    //   pushToRemote = false;
+    // } else if (
+    //   askedPushToRemote === "" ||
+    //   askedPushToRemote.toLowerCase() === "y"
+    // ) {
+    //   pushToRemote = true;
+    // } else {
+    //   throw new Error("Invalid input. Please enter 'Y' or 'n'.");
+    // }
   }
 
   const unstagedFiles = await getUnstagedFiles(git)
