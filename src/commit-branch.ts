@@ -2,7 +2,7 @@ import { checkbox, confirm, input } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { getHumanAge } from "./human-age"
-import { success, warn } from "./logger"
+import { bold, success, warn } from "./logger"
 import { getTitle } from "./storage"
 
 type Options = {
