@@ -7,9 +7,10 @@ import { getTitle } from "./storage"
 
 type Options = {
   verify?: boolean
-  yes?: boolean
+  force?: boolean
 }
 export async function commitBranch(options: Options) {
+  const force = Boolean(options.force)
   const noVerify = !options.verify
   const git = simpleGit()
   const branchSummary = await git.branch()
@@ -72,7 +73,7 @@ export async function commitBranch(options: Options) {
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   const originName = origin ? origin.name : "origin"
 
-  let pushToRemote = Boolean(options.yes)
+  let pushToRemote = force
   if (!pushToRemote && origin) {
     pushToRemote = await confirm({
       message: `Push to ${originName}:`,
@@ -93,20 +94,30 @@ export async function commitBranch(options: Options) {
   const unstagedFiles = await getUnstagedFiles(git)
   await git.add(unstagedFiles)
 
-  await git.commit(title, noVerify ? ["--no-verify"] : undefined)
-  if (pushToRemote) {
-    await git.push("origin", currentBranch)
-    success(`Changes pushed to ${originName}/${currentBranch}`)
-  } else {
-    success("Changes committed but not pushed.")
-  }
+  try {
+    await git.commit(title, noVerify ? ["--no-verify"] : undefined)
+    if (pushToRemote) {
+      await git.push("origin", currentBranch)
+      success(`Changes pushed to ${originName}/${currentBranch}`)
+    } else {
+      success("Changes committed but not pushed.")
+    }
+    const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
+    if (nwo) {
+      // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 
-  const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
-  if (nwo) {
-    // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
-
-    success(`https://github.com/${nwo}/pull/new/${currentBranch}`)
-    console.log("(⌘-click to open URLs)")
+      success(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+      console.log("(⌘-click to open URLs)")
+    }
+  } catch (error) {
+    if (force) {
+      if (error instanceof Error) {
+        console.log("ERROR", error)
+        console.log("ERROR.NAME", error.name)
+        console.log("ERROR MESSAGE WAS", error.message)
+      }
+    }
+    throw error
   }
 }
 
