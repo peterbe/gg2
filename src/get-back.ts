@@ -4,10 +4,10 @@ import { getDefaultBranch } from "./branch-utils"
 import { success, warn } from "./logger"
 
 type Options = {
-  force?: boolean
+  yes?: boolean
 }
 export async function getBack(options: Options) {
-  const force = Boolean(options.force)
+  const yes = Boolean(options.yes)
   const git = simpleGit()
   const branchSummary = await git.branch()
   const currentBranch = branchSummary.current
@@ -41,11 +41,11 @@ export async function getBack(options: Options) {
         "If you are sure you want to delete it, run 'git branch -D",
       )
     ) {
-      if (!force) {
+      if (!yes) {
         warn(`Doesn't look fully merged into ${defaultBranch} yet.`)
       }
       const sure =
-        force ||
+        yes ||
         (await confirm({
           message: `Are you sure you want to delete '${currentBranch}'?`,
           default: true,
