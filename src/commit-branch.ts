@@ -110,18 +110,18 @@ export async function commitBranch(options: Options) {
       console.log("(⌘-click to open URLs)")
     }
   } catch (error) {
-    if (yes) {
-      if (error instanceof Error) {
-        console.log("ERROR", error)
-        console.log("ERROR.NAME", error.name)
-        console.log({ "ERROR MESSAGE WAS": error.message })
-        if (error.message.includes("nothing to commit, working tree clean")) {
-          await git.push("origin", currentBranch)
-          success(`Changes pushed to ${originName}/${currentBranch}`)
-        }
-      }
+    if (
+      yes &&
+      error instanceof Error &&
+      error.message.includes("nothing to commit, working tree clean")
+    ) {
+      // console.log("ERROR", error)
+      // console.log("ERROR.NAME", error.name)
+      await git.push("origin", currentBranch)
+      success(`Changes pushed to ${originName}/${currentBranch}`)
+    } else {
+      throw error
     }
-    throw error
   }
 }
 
