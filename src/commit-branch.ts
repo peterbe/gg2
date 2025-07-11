@@ -2,7 +2,7 @@ import { checkbox, confirm, input } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { getHumanAge } from "./human-age"
-import { success, warn } from "./logger"
+import { bold, success, warn } from "./logger"
 import { getTitle } from "./storage"
 
 type Options = {
@@ -106,7 +106,7 @@ export async function commitBranch(options: Options) {
     if (nwo) {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 
-      success(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+      bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
       console.log("(⌘-click to open URLs)")
     }
   } catch (error) {

@@ -1,7 +1,7 @@
 import { confirm } from "@inquirer/prompts"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
-import { warn } from "./logger"
+import { success, warn } from "./logger"
 
 type Options = {
   force?: boolean
@@ -52,6 +52,7 @@ export async function getBack(options: Options) {
         }))
       if (sure) {
         await git.deleteLocalBranch(currentBranch, true)
+        success(`Deleted branch '${currentBranch}'`)
       } else {
         warn(`Did not delete branch '${currentBranch}'`)
       }

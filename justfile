@@ -30,8 +30,8 @@ outdated:
     bun outdated
     bunx npm-check-updates --interactive
 
-# test:
-#     bun run test
+test:
+    bun test
 
 # alias
 upgrade: outdated
