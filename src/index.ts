@@ -62,7 +62,7 @@ program
   .command("getback")
   .description("Go back to the default branch and delete this one")
   .option("--debug", "Debug mode (shows traceback)")
-  .option("-f, --force", "Force delete if you have to")
+  .option("-y, --yes", "Push")
   .action((options) => {
     wrap(getBack(options), options.debug)
   })
