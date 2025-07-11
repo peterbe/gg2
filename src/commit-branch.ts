@@ -32,9 +32,6 @@ export async function commitBranch(options: Options) {
       message: "Do you want to add these untracked files? [y/n/i]",
     })
     if (confirmed.toLowerCase() === "n") {
-      // throw new Error(
-      //   "Untracked files found. Please add them before committing."
-      // );
     } else if (confirmed.toLowerCase() === "y") {
       await git.add(untrackedFiles)
     } else if (confirmed.toLowerCase() === "i") {
@@ -115,8 +112,6 @@ export async function commitBranch(options: Options) {
       error instanceof Error &&
       error.message.includes("nothing to commit, working tree clean")
     ) {
-      // console.log("ERROR", error)
-      // console.log("ERROR.NAME", error.name)
       await git.push("origin", currentBranch)
       success(`Changes pushed to ${originName}/${currentBranch}`)
     } else {
@@ -152,7 +147,6 @@ async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
 
 async function getUnstagedFiles(git: SimpleGit): Promise<string[]> {
   const status = await git.status()
-  // console.log("Unstaged files:", status.staged);
   return status.modified
 }
 
