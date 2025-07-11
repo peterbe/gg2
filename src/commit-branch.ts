@@ -106,7 +106,7 @@ export async function commitBranch(options: Options) {
     if (nwo) {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 
-      success(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+      bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
       console.log("(⌘-click to open URLs)")
     }
   } catch (error) {
