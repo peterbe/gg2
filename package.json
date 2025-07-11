@@ -6,7 +6,9 @@
   "private": true,
   "scripts": {
     "lint": "biome check --write --unsafe",
+    "lint:check": "biome check",
     "build": "bun build src/index.ts --target=bun --outfile out/gg --compile",
+    "build:linux-arm64": "bun build src/index.ts --target=bun-linux-arm64 --outfile out/gg-linux-arm64 --compile",
     "prepare": "husky"
   },
   "devDependencies": {
