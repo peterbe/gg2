@@ -76,16 +76,6 @@ export async function commitBranch(options: Options) {
       message: `Push to ${originName}:`,
       default: true,
     })
-    // if (askedPushToRemote.toLowerCase() === "n") {
-    //   pushToRemote = false;
-    // } else if (
-    //   askedPushToRemote === "" ||
-    //   askedPushToRemote.toLowerCase() === "y"
-    // ) {
-    //   pushToRemote = true;
-    // } else {
-    //   throw new Error("Invalid input. Please enter 'Y' or 'n'.");
-    // }
   }
 
   const unstagedFiles = await getUnstagedFiles(git)
