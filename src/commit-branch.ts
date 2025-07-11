@@ -99,12 +99,10 @@ export async function commitBranch(options: Options) {
   } else {
     success("Changes committed but not pushed.")
   }
-  warn("Need to print URL for creating new gitHub pr")
 
-  // const config = await getRepoConfig();
   const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
   if (nwo) {
-    // https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+    // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 
     success(`https://github.com/${nwo}/pull/new/${currentBranch}`)
     console.log("(⌘-click to open URLs)")
