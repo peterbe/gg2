@@ -1,6 +1,7 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
+import { getGitHubNWO } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { bold, success, warn } from "./logger"
 import { getTitle } from "./storage"
@@ -128,26 +129,6 @@ export async function commitBranch(options: Options) {
     bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
     console.log("(⌘-click to open URLs)")
   }
-}
-
-function getGitHubNWO(url: string): string | undefined {
-  // E.g. git@github.com:peterbe/admin-peterbecom.gi
-  // or https://github.com/peterbe/admin-peterbecom.git"
-  if (url.includes("github.com")) {
-    if (URL.canParse(url)) {
-      const parsed = new URL(url)
-      return parsed.pathname.replace(/\.git$/, "").slice(1)
-    }
-    if (url.includes("git@github.com:")) {
-      const second = url.split(":")[1]
-      if (second) {
-        return second.replace(/\.git$/, "")
-      }
-    } else {
-      throw new Error(`Not implemented (${url})`)
-    }
-  }
-  return url
 }
 
 async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
