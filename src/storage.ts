@@ -9,25 +9,18 @@ export async function storeTitle(
   branchName: string,
   title: string,
 ): Promise<void> {
-  // const git = simpleGit();
-  // if (!(await git.checkIsRepo())) {
-  //   throw new Error("Not a git repository");
-  // }
-  // const data = await getData();
-  // const rootPath = await git.revparse(["--show-toplevel"]);
-  // if (!data.REPOS[rootPath]) {
-  //   data.REPOS[rootPath] = {};
-  // }
-
-  // data.REPOS[rootPath][branchName] = title;
   const [data, repoData] = await getRepoData()
   repoData.BRANCH_TITLES[branchName] = title
   await db.write(JSON.stringify(data, null, 2))
 }
 
-type ReposStorage = {
-  [key: string]: string
-}
+// type ReposStorage = {
+//   [key: string]: string
+// }
+
+type ConfigKeys = "branch-prefix" | "title-prefix" // more to come!
+
+type GlobalConfigKeys = "github-token" // more to come
 
 type BranchTitles = Record<string, string>
 type ConfigValues = Record<string, string>
@@ -40,7 +33,7 @@ type StorageObject = {
   REPOS: {
     [repo: string]: RepoData
   }
-  GLOBAL_CONFIG: ReposStorage
+  GLOBAL_CONFIG: ConfigValues
 }
 
 async function getData(): Promise<StorageObject> {
@@ -55,19 +48,6 @@ async function getData(): Promise<StorageObject> {
   return data
 }
 
-// async function getRepoData(root: string) {
-//   const git = simpleGit();
-//   if (!(await git.checkIsRepo())) {
-//     throw new Error("Not a git repository");
-//   }
-//   const data = await getData();
-//   const rootPath = await git.revparse(["--show-toplevel"]);
-
-//   // if (!data.REPOS[rootPath]) {
-//   //   data.REPOS[rootPath] = {};
-//   // }
-//   // return data.REPOS[rootPath];
-// }
 async function getRepoKey() {
   const git = simpleGit()
   if (!(await git.checkIsRepo())) {
@@ -95,33 +75,13 @@ function expandPath(path: string): string {
     .join(sep)
 }
 
-type ConfigKeys = "branch-prefix" | "title-prefix" // more to come!
-
 export async function storeConfig(key: ConfigKeys, value: string) {
-  // const data = await getData();
-  // const repoKey = await getRepoKey();
-  // if (!data.REPOS[repoKey]) {
-  //   data.REPOS[repoKey] = {
-  //     BRANCH_TITLES: {},
-  //     CONFIG: {},
-  //   };
-  // }
-  // const repoData = data.REPOS[repoKey];
   const [data, repoData] = await getRepoData()
   repoData.CONFIG[key] = value
   await db.write(JSON.stringify(data, null, 2))
 }
 
 export async function getRepoConfig(): Promise<ConfigValues> {
-  // const data = await getData();
-  // const repoKey = await getRepoKey();
-  // if (!data.REPOS[repoKey]) {
-  //   data.REPOS[repoKey] = {
-  //     BRANCH_TITLES: {},
-  //     CONFIG: {},
-  //   };
-  // }
-  // return data.REPOS[repoKey].CONFIG;
   const [, repoData] = await getRepoData()
   return repoData.CONFIG
 }
@@ -136,4 +96,15 @@ async function getRepoData(): Promise<[StorageObject, RepoData]> {
     }
   }
   return [data, data.REPOS[repoKey]]
+}
+
+export async function getGlobalConfig(): Promise<ConfigValues> {
+  const data = await getData()
+  return data.GLOBAL_CONFIG
+}
+
+export async function storeGlobalConfig(key: GlobalConfigKeys, value: string) {
+  const data = await getData()
+  data.GLOBAL_CONFIG[key] = value
+  await db.write(JSON.stringify(data, null, 2))
 }

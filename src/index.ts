@@ -4,6 +4,7 @@ import { version } from "../package.json"
 import { commitBranch } from "./commit-branch"
 import { configureRepo } from "./configure-repo"
 import { getBack } from "./get-back"
+import { gitHubToken } from "./github"
 import { error } from "./logger"
 import { repoConfig } from "./repo-config"
 import { startBranch } from "./start-branch"
@@ -65,6 +66,18 @@ program
   .option("-y, --yes", "Push")
   .action((options) => {
     wrap(getBack(options), options.debug)
+  })
+const gitHubCommand = program
+  .command("github")
+  .description("Configure your connecto to GitHub")
+
+gitHubCommand
+  .command("token")
+  .argument("[token]", "token")
+  .description("Set your personal access token to GitHub")
+  .option("--test", "Test if the existing token works")
+  .action((token, options) => {
+    wrap(gitHubToken(token, options), options.debug)
   })
 
 program.parse()
