@@ -77,11 +77,11 @@ export async function commitBranch(options: Options) {
     if (noVerify) {
       await git.commit(title, ["--no-verify"])
     } else {
-      // await $`git commit -m "${title}"`
-      const proc = Bun.spawn(["git", "commit", "-m", title], {
-        // stdout: "inherit",
-        // stderr: "inherit",
-      })
+      // If the pre-commit hook prints errors, with colors,
+      // using this Bun.spawn is the only way I know to preserve those outputs
+      // in color.
+      // This also means, that when all goes well, it will print too.
+      const proc = Bun.spawn(["git", "commit", "-m", title])
       const exited = await proc.exited
       if (exited) {
         console.log("\n")
