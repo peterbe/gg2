@@ -79,7 +79,7 @@ export async function commitBranch(options: Options) {
     } else {
       const proc = Bun.spawn(["git", "commit", "-m", title], {
         // stdout: "inherit",
-        stderr: "inherit",
+        // stderr: "inherit",
       })
       const exited = await proc.exited
       if (exited) {
