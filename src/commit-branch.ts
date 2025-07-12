@@ -78,7 +78,7 @@ export async function commitBranch(options: Options) {
       await git.commit(title, ["--no-verify"])
     } else {
       const proc = Bun.spawn(["git", "commit", "-m", title], {
-        stdout: "inherit",
+        // stdout: "inherit",
         stderr: "inherit",
       })
       const exited = await proc.exited
