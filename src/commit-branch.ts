@@ -1,5 +1,4 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
-import { $ } from "bun"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { getHumanAge } from "./human-age"
@@ -78,20 +77,20 @@ export async function commitBranch(options: Options) {
     if (noVerify) {
       await git.commit(title, ["--no-verify"])
     } else {
-      await $`git commit -m "${title}"`
-      // const proc = Bun.spawn(["git", "commit", "-m", title], {
-      //   // stdout: "inherit",
-      //   // stderr: "inherit",
-      // })
-      // const exited = await proc.exited
-      // if (exited) {
-      //   console.log("\n")
-      //   warn("Warning! The git commit failed.")
-      //   warn(
-      //     "Hopefully the printed error message above is clear enough. You'll have to try to commit again.",
-      //   )
-      //   process.exit(exited)
-      // }
+      // await $`git commit -m "${title}"`
+      const proc = Bun.spawn(["git", "commit", "-m", title], {
+        // stdout: "inherit",
+        // stderr: "inherit",
+      })
+      const exited = await proc.exited
+      if (exited) {
+        console.log("\n")
+        warn("Warning! The git commit failed.")
+        warn(
+          "Hopefully the printed error message above is clear enough. You'll have to try to commit again.",
+        )
+        process.exit(exited)
+      }
     }
   } catch (error) {
     console.warn("An error happened when trying to commmit!")
