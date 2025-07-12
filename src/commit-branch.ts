@@ -1,7 +1,13 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
+import type { Endpoints } from "@octokit/types"
+import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
-import { getGitHubNWO, getPRByBranchName } from "./github-utils"
+import {
+  getGitHubNWO,
+  getPRByBranchName,
+  getPRDetailsByNumber,
+} from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { bold, success, warn } from "./logger"
 import { getTitle } from "./storage"
@@ -129,6 +135,31 @@ export async function commitBranch(options: Options) {
 
     if (pr) {
       bold(pr.html_url)
+      console.log("\nPR details...")
+
+      const prDetails = await getPRDetailsByNumber(pr.number)
+
+      type PullRequestResponse =
+        Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}"]["response"]
+
+      type PullRequestData = PullRequestResponse["data"]
+
+      type PullRequestKeys = keyof PullRequestData
+      const KEYS = [
+        "title",
+        "mergeable_state",
+        "mergeable",
+      ] as PullRequestKeys[]
+      const longestKey = Math.max(...KEYS.map((key) => key.length))
+      const padding = Math.max(30, longestKey) + 1
+
+      for (const key of KEYS) {
+        const value = prDetails[key]
+        console.log(
+          kleur.bold(`${key}:`.padEnd(padding, " ")),
+          typeof value === "string" ? kleur.italic(value) : value,
+        )
+      }
     } else {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 
