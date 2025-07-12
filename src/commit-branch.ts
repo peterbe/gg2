@@ -122,6 +122,7 @@ export async function commitBranch(options: Options) {
   } else {
     success("Changes committed but not pushed.")
   }
+  console.log("\n")
   const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
   if (nwo) {
     const pr = await getPRByBranchName(currentBranch)
