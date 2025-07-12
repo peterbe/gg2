@@ -9,6 +9,7 @@ type Options = {
   verify?: boolean
   yes?: boolean
 }
+
 export async function commitBranch(options: Options) {
   const yes = Boolean(options.yes)
   const noVerify = !options.verify
