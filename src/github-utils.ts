@@ -1,3 +1,7 @@
+import { Octokit } from "octokit"
+import simpleGit from "simple-git"
+import { getGlobalConfig } from "./storage"
+
 export function getGitHubNWO(url: string): string | undefined {
   // E.g. git@github.com:peterbe/admin-peterbecom.gi
   // or https://github.com/peterbe/admin-peterbecom.git"
@@ -16,4 +20,68 @@ export function getGitHubNWO(url: string): string | undefined {
     }
   }
   return url
+}
+
+export async function getPRByBranchName(branchName: string) {
+  const octokit = await getOctokit()
+  const [owner, repo] = await getOwnerRepo()
+  const { data: prs } = await octokit.rest.pulls.list({
+    owner,
+    repo,
+    head: `${owner}:${branchName}`,
+    state: "all",
+    sort: "updated",
+    direction: "desc",
+  })
+  for (const pr of prs) {
+    return pr
+  }
+}
+
+async function getOwnerRepo(): Promise<[string, string]> {
+  const git = simpleGit()
+  const remotes = await git.getRemotes(true) // true includes URLs
+  const origin = remotes.find((remote) => remote.name === "origin")
+  const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
+  if (!originUrl) {
+    throw new Error(
+      "Can't find an origin URL from the current remotes. Run `git remotes -v` to debug.",
+    )
+  }
+  const nwo = getGitHubNWO(originUrl)
+  if (!nwo)
+    throw new Error(
+      `Could not figure out owner/repo from the URL: ${originUrl}`,
+    )
+  const owner = nwo.split("/")[0]
+  if (!owner) throw new Error(`Can't find owner part from '${nwo}'`)
+  const repo = nwo.split("/").slice(1).join("/")
+  if (!repo) throw new Error(`Can't find repo part from '${nwo}'`)
+
+  return [owner, repo]
+}
+
+async function getOctokit() {
+  const config = await getGlobalConfig()
+  const token = config["github-token"]
+  if (!token) {
+    throw new Error(
+      "You have not set up a GitHub Personal Access Token. Run `github token`.",
+    )
+  }
+
+  const octokit = new Octokit({ auth: token })
+  return octokit
+}
+
+export async function getPRDetailsByNumber(number: number) {
+  const octokit = await getOctokit()
+  const [owner, repo] = await getOwnerRepo()
+
+  const { data: prDetails } = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number: number,
+  })
+  return prDetails
 }

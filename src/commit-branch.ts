@@ -1,7 +1,7 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
-import { getGitHubNWO } from "./github-utils"
+import { getGitHubNWO, getPRByBranchName } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { bold, success, warn } from "./logger"
 import { getTitle } from "./storage"
@@ -124,9 +124,15 @@ export async function commitBranch(options: Options) {
   }
   const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
   if (nwo) {
-    // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+    const pr = await getPRByBranchName(currentBranch)
 
-    bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+    if (pr) {
+      bold(pr.html_url)
+    } else {
+      // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+
+      bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+    }
     console.log("(⌘-click to open URLs)")
   }
 }
