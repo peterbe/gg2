@@ -9,6 +9,7 @@ type Options = {
   verify?: boolean
   yes?: boolean
 }
+
 export async function commitBranch(options: Options) {
   const yes = Boolean(options.yes)
   const noVerify = !options.verify
@@ -70,33 +71,30 @@ export async function commitBranch(options: Options) {
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   const originName = origin ? origin.name : "origin"
 
-  let pushToRemote = yes
-  if (!pushToRemote && origin) {
-    pushToRemote = await confirm({
-      message: `Push to ${originName}:`,
-      default: true,
-    })
-  }
-
   const unstagedFiles = await getUnstagedFiles(git)
   await git.add(unstagedFiles)
 
   try {
-    await git.commit(title, noVerify ? ["--no-verify"] : undefined)
-    if (pushToRemote) {
-      await git.push("origin", currentBranch)
-      success(`Changes pushed to ${originName}/${currentBranch}`)
+    if (noVerify) {
+      await git.commit(title, ["--no-verify"])
     } else {
-      success("Changes committed but not pushed.")
-    }
-    const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
-    if (nwo) {
-      // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
-
-      bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
-      console.log("(⌘-click to open URLs)")
+      // If the pre-commit hook prints errors, with colors,
+      // using this Bun.spawn is the only way I know to preserve those outputs
+      // in color.
+      // This also means, that when all goes well, it will print too.
+      const proc = Bun.spawn(["git", "commit", "-m", title])
+      const exited = await proc.exited
+      if (exited) {
+        console.log("\n")
+        warn("Warning! The git commit failed.")
+        warn(
+          "Hopefully the printed error message above is clear enough. You'll have to try to commit again.",
+        )
+        process.exit(exited)
+      }
     }
   } catch (error) {
+    console.warn("An error happened when trying to commmit!")
     if (
       yes &&
       error instanceof Error &&
@@ -107,6 +105,28 @@ export async function commitBranch(options: Options) {
     } else {
       throw error
     }
+  }
+
+  let pushToRemote = yes
+  if (!pushToRemote && origin) {
+    pushToRemote = await confirm({
+      message: `Push to ${originName}:`,
+      default: true,
+    })
+  }
+
+  if (pushToRemote) {
+    await git.push("origin", currentBranch)
+    success(`Changes pushed to ${originName}/${currentBranch}`)
+  } else {
+    success("Changes committed but not pushed.")
+  }
+  const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
+  if (nwo) {
+    // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+
+    bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+    console.log("(⌘-click to open URLs)")
   }
 }
 
