@@ -4,7 +4,7 @@ import { version } from "../package.json"
 import { commitBranch } from "./commit-branch"
 import { configureRepo } from "./configure-repo"
 import { getBack } from "./get-back"
-import { gitHubToken } from "./github"
+import { gitHubPR, gitHubToken } from "./github"
 import { error } from "./logger"
 import { repoConfig } from "./repo-config"
 import { startBranch } from "./start-branch"
@@ -23,6 +23,9 @@ program
   .option("--debug", "Debug mode (shows traceback)")
   .argument("[url]", "GitHub or Jira ticket URL")
   .action((url, options) => {
+    if (url) {
+      throw new Error("Not implemented yet.")
+    }
     // if (url) {
     //     if (!URL.canParse(url)) {
     //         console.error("Invalid URL provided.");
@@ -67,6 +70,14 @@ program
   .action((options) => {
     wrap(getBack(options), options.debug)
   })
+
+program // alias for `github pr`
+  .command("pr")
+  .description("Get the current GitHub Pull Request for the current branch")
+  .action((options) => {
+    wrap(gitHubPR(), options.debug)
+  })
+
 const gitHubCommand = program
   .command("github")
   .description("Configure your connecto to GitHub")
@@ -78,6 +89,13 @@ gitHubCommand
   .option("--test", "Test if the existing token works")
   .action((token, options) => {
     wrap(gitHubToken(token, options), options.debug)
+  })
+
+gitHubCommand
+  .command("pr")
+  .description("Get the current GitHub Pull Request for the current branch")
+  .action((options) => {
+    wrap(gitHubPR(), options.debug)
   })
 
 program.parse()

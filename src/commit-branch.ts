@@ -1,6 +1,13 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
+import type { Endpoints } from "@octokit/types"
+import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
+import {
+  getGitHubNWO,
+  getPRByBranchName,
+  getPRDetailsByNumber,
+} from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { bold, success, warn } from "./logger"
 import { getTitle } from "./storage"
@@ -121,33 +128,45 @@ export async function commitBranch(options: Options) {
   } else {
     success("Changes committed but not pushed.")
   }
+  console.log("\n")
   const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
   if (nwo) {
-    // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+    const pr = await getPRByBranchName(currentBranch)
 
-    bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
-    console.log("(⌘-click to open URLs)")
-  }
-}
+    if (pr) {
+      bold(pr.html_url)
+      console.log("\nPR details...")
 
-function getGitHubNWO(url: string): string | undefined {
-  // E.g. git@github.com:peterbe/admin-peterbecom.gi
-  // or https://github.com/peterbe/admin-peterbecom.git"
-  if (url.includes("github.com")) {
-    if (URL.canParse(url)) {
-      const parsed = new URL(url)
-      return parsed.pathname.replace(/\.git$/, "").slice(1)
-    }
-    if (url.includes("git@github.com:")) {
-      const second = url.split(":")[1]
-      if (second) {
-        return second.replace(/\.git$/, "")
+      const prDetails = await getPRDetailsByNumber(pr.number)
+
+      type PullRequestResponse =
+        Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}"]["response"]
+
+      type PullRequestData = PullRequestResponse["data"]
+
+      type PullRequestKeys = keyof PullRequestData
+      const KEYS = [
+        "title",
+        "mergeable_state",
+        "mergeable",
+      ] as PullRequestKeys[]
+      const longestKey = Math.max(...KEYS.map((key) => key.length))
+      const padding = Math.max(30, longestKey) + 1
+
+      for (const key of KEYS) {
+        const value = prDetails[key]
+        console.log(
+          kleur.bold(`${key}:`.padEnd(padding, " ")),
+          typeof value === "string" ? kleur.italic(value) : value,
+        )
       }
     } else {
-      throw new Error(`Not implemented (${url})`)
+      // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
+
+      bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
     }
+    console.log("(⌘-click to open URLs)")
   }
-  return url
 }
 
 async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
