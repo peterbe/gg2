@@ -1,0 +1,6 @@
+.husky/
+.github/
+out/
+dummy*
+.DS_Store
+.vscode
