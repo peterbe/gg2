@@ -1,0 +1,31 @@
+name: Compile
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - target: bun-linux-arm64
+            asset_name: gg-linux-arm64
+          - target: bun-linux-x64
+            asset_name: gg-linux-x64
+          - target: bun-windows-x64
+            asset_name: gg-windows-x64.exe
+          - target: bun-darwin-arm64
+            asset_name: gg-darwin-arm64
+          - target: bun-darwin-x64
+            asset_name: gg-darwin-x64
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun build src/index.ts --compile --target=${{ matrix.target.target }} --outfile out/${{ matrix.target.asset_name }}
+
