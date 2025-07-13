@@ -11,11 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [linux-arm64, linux-x64, windows-x64, darwin-arm64, darwin-x64]
+        target:
+          - target: bun-linux-arm64
+            asset_name: gg-linux-arm64
+          - target: bun-linux-x64
+            asset_name: gg-linux-x64
+          -target: windows-x64
+            asset_name: gg-windows-x64.ext
+          - target: darwin-arm64
+            asset_name: gg-darwin-arm64
+          - target: darwin-x64
+            asset_name: gg-darwin-x64
 
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
-      - run: bun build src/index.ts --compile --target=bun-${{ matrix.target }} --outfile out/gg-${{ matrix.target }}
+      - run: bun build src/index.ts --compile --target=${{ matrix.target }} --outfile out/${{ matrix.asset_name }}
 
