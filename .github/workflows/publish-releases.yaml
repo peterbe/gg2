@@ -6,7 +6,19 @@ on:
       - '*'
 
 jobs:
+  create-release:
+    name: Create release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+      - name: Publish release
+        uses: ghalactic/github-release-from-tag@v5
+
   publish-releases:
+    needs: create-release
     name: Publish binaries
     runs-on: ubuntu-latest
 
