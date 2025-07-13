@@ -10,6 +10,7 @@
     "build": "bun build src/index.ts --target=bun --outfile out/gg --compile",
     "build:linux-arm64": "bun build src/index.ts --target=bun-linux-arm64 --outfile out/gg-linux-arm64 --compile",
     "prepare": "husky",
+    "test": "bun test",
     "release": "np"
   },
   "devDependencies": {
