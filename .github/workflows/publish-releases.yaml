@@ -15,7 +15,17 @@ jobs:
 
     strategy:
       matrix:
-        target: [linux-arm64, linux-x64, windows-x64, darwin-arm64, darwin-x64]
+        target:
+          - target: bun-linux-arm64
+            asset_name: gg-linux-arm64
+          - target: bun-linux-x64
+            asset_name: gg-linux-x64
+          - target: bun-windows-x64
+            asset_name: gg-windows-x64.exe
+          - target: bun-darwin-arm64
+            asset_name: gg-darwin-arm64
+          - target: bun-darwin-x64
+            asset_name: gg-darwin-x64
 
     steps:
       - uses: actions/checkout@v4
@@ -23,14 +33,14 @@ jobs:
       - run: bun install
       - name: Build
         run: |
-          bun build src/index.ts --compile --target=bun-${{ matrix.target }} --outfile out/gg-${{ matrix.target }}
+          bun build src/index.ts --compile --target=${{ matrix.target.target }} --outfile out/${{ matrix.target.asset_name }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: out/gg-${{ matrix.target }}
+          file: out/${{ matrix.target.asset_name }}
           asset_name: ${{ matrix.target }}
           tag: ${{ github.ref }}
           overwrite: true
-          body: "Binary release for ${{ matrix.target }}"
+          body: "Binary release for ${{ matrix.target.target }}"
