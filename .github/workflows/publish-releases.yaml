@@ -9,19 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  # create-release:
-  #   name: Create release
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write
-  #     discussions: write # (for release discussion creation)
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Publish release
-  #       uses: ghalactic/github-release-from-tag@v5
-
   publish-releases:
-    # needs: create-release
     name: Publish binaries
     runs-on: ubuntu-latest
 
