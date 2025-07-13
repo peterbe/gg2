@@ -75,7 +75,4 @@ export async function gitHubPR() {
   const { message, canMerge } = interpretMergeableStatus(prDetails)
   if (canMerge) success(message)
   else warn(message)
-
-  console.log(prDetails)
-  console.log("auto_merge:", prDetails.auto_merge)
 }
