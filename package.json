@@ -1,7 +1,7 @@
 {
   "name": "gg2",
   "module": "index.ts",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -9,12 +9,14 @@
     "lint:check": "biome check",
     "build": "bun build src/index.ts --target=bun --outfile out/gg --compile",
     "build:linux-arm64": "bun build src/index.ts --target=bun-linux-arm64 --outfile out/gg-linux-arm64 --compile",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "np"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
     "@types/bun": "latest",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "np": "^10.2.0"
   },
   "peerDependencies": {
     "typescript": "^5"

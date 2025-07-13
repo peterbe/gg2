@@ -88,7 +88,6 @@ export async function getPRDetailsByNumber(number: number) {
 
 type PRDetails = Awaited<ReturnType<typeof getPRDetailsByNumber>>
 export function interpretMergeableStatus(pr: PRDetails) {
-  // If PR is closed or already merged
   if (pr.state === "closed" && pr.merged) {
     return {
       canMerge: false,
@@ -103,7 +102,6 @@ export function interpretMergeableStatus(pr: PRDetails) {
     }
   }
 
-  // If PR is draft
   if (pr.draft) {
     return {
       canMerge: false,
@@ -111,7 +109,6 @@ export function interpretMergeableStatus(pr: PRDetails) {
     }
   }
 
-  // Check mergeable status
   switch (pr.mergeable_state) {
     case "clean":
       return {
@@ -156,7 +153,6 @@ export function interpretMergeableStatus(pr: PRDetails) {
       }
 
     default:
-      // Check the basic mergeable field as fallback
       if (pr.mergeable === true) {
         return {
           canMerge: true,
