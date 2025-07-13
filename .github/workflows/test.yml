@@ -20,4 +20,3 @@ jobs:
       - run: bun run build
       - run: bun run build:linux-arm64
       - run: bun test
-      - run: sleep 60
