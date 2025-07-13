@@ -1,6 +1,7 @@
 name: Publish
 
 on:
+  workflow_dispatch: # Manually trigger workflow (mostly for debugging)
   push:
     tags:
       - '*'
