@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        target: [linux-arm64, linux-x64, windows-x64, darwin-arm64, gg-darwin-x64]
+        target: [linux-arm64, linux-x64, windows-x64, darwin-arm64, darwin-x64]
 
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       - run: bun install
       - name: Build
         run: |
-          bun build src/index.ts --compile --target=bun-${{ matrix.target }} --outfile out/${{ matrix.target }}
+          bun build src/index.ts --compile --target=bun-${{ matrix.target }} --outfile out/gg-${{ matrix.target }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
