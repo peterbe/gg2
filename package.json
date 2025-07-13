@@ -14,7 +14,7 @@
     "build:linux-arm64": "bun build src/index.ts --target=bun-linux-arm64 --outfile out/gg-linux-arm64 --compile",
     "prepare": "husky",
     "test": "bun test",
-    "release": "np --no-tests"
+    "release": "np --yolo"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
