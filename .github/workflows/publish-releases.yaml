@@ -2,6 +2,11 @@ name: Publish
 
 on:
   workflow_dispatch: # Manually trigger workflow (mostly for debugging)
+    inputs:
+      tag:
+        description: 'Which tag'
+        required: true
+        type: string
   push:
     tags:
       - '*'
@@ -29,6 +34,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: out/gg-${{ matrix.target }}
           asset_name: ${{ matrix.target }}
-          tag: ${{ github.ref }}
+          tag: ${{ context.payload.inputs.tag || github.ref }}
           overwrite: true
           body: "Binary release for ${{ matrix.target }}"
