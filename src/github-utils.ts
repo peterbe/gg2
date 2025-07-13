@@ -87,7 +87,7 @@ export async function getPRDetailsByNumber(number: number) {
 }
 
 type PRDetails = Awaited<ReturnType<typeof getPRDetailsByNumber>>
-function _interpretMergeableStatus(pr: PRDetails) {
+export function interpretMergeableStatus(pr: PRDetails) {
   // If PR is closed or already merged
   if (pr.state === "closed" && pr.merged) {
     return {
