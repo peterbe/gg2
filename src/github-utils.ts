@@ -85,3 +85,93 @@ export async function getPRDetailsByNumber(number: number) {
   })
   return prDetails
 }
+
+type PRDetails = Awaited<ReturnType<typeof getPRDetailsByNumber>>
+export function interpretMergeableStatus(pr: PRDetails) {
+  // If PR is closed or already merged
+  if (pr.state === "closed" && pr.merged) {
+    return {
+      canMerge: false,
+      message: "PR is already merged",
+    }
+  }
+
+  if (pr.state === "closed" && !pr.merged) {
+    return {
+      canMerge: false,
+      message: "PR is closed without merging",
+    }
+  }
+
+  // If PR is draft
+  if (pr.draft) {
+    return {
+      canMerge: false,
+      message: "PR is in draft state",
+    }
+  }
+
+  // Check mergeable status
+  switch (pr.mergeable_state) {
+    case "clean":
+      return {
+        canMerge: true,
+        message: "PR is ready to merge - all checks passed",
+      }
+
+    case "dirty":
+      return {
+        canMerge: false,
+        message: "PR has merge conflicts that need to be resolved",
+      }
+
+    case "blocked":
+      return {
+        canMerge: false,
+        message: "PR is blocked by required status checks or reviews",
+      }
+
+    case "behind":
+      return {
+        canMerge: true,
+        message: "PR can be merged but base branch has newer commits",
+      }
+
+    case "unstable":
+      return {
+        canMerge: true,
+        message: "PR can be merged but some status checks failed",
+      }
+
+    case "has_hooks":
+      return {
+        canMerge: true,
+        message: "PR can be merged but has pre-receive hooks",
+      }
+
+    case "unknown":
+      return {
+        canMerge: null,
+        message: "Mergeable status is being calculated, try again in a moment",
+      }
+
+    default:
+      // Check the basic mergeable field as fallback
+      if (pr.mergeable === true) {
+        return {
+          canMerge: true,
+          message: "PR appears to be mergeable",
+        }
+      } else if (pr.mergeable === false) {
+        return {
+          canMerge: false,
+          message: "PR has conflicts or other issues preventing merge",
+        }
+      } else {
+        return {
+          canMerge: null,
+          message: "Mergeable status is null - GitHub is still calculating",
+        }
+      }
+  }
+}

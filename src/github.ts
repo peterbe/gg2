@@ -1,10 +1,13 @@
 import { input } from "@inquirer/prompts"
-import type { Endpoints } from "@octokit/types"
 import kleur from "kleur"
 import { Octokit } from "octokit"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
-import { getPRByBranchName, getPRDetailsByNumber } from "./github-utils"
+import {
+  getPRByBranchName,
+  getPRDetailsByNumber,
+  interpretMergeableStatus,
+} from "./github-utils"
 import { success, warn } from "./logger"
 import { getGlobalConfig, storeGlobalConfig } from "./storage"
 
@@ -68,21 +71,8 @@ export async function gitHubPR() {
 
   const prDetails = await getPRDetailsByNumber(pr.number)
 
-  type PullRequestResponse =
-    Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}"]["response"]
-
-  type PullRequestData = PullRequestResponse["data"]
-
-  type PullRequestKeys = keyof PullRequestData
-  const KEYS = ["title", "mergeable_state", "mergeable"] as PullRequestKeys[]
-  const longestKey = Math.max(...KEYS.map((key) => key.length))
-  const padding = Math.max(30, longestKey) + 1
-
-  for (const key of KEYS) {
-    const value = prDetails[key]
-    console.log(
-      kleur.bold(`${key}:`.padEnd(padding, " ")),
-      typeof value === "string" ? kleur.italic(value) : value,
-    )
-  }
+  console.log(kleur.bold(`PR Title: ${prDetails.title}`))
+  const { message, canMerge } = interpretMergeableStatus(prDetails)
+  if (canMerge) success(message)
+  else warn(message)
 }
