@@ -16,7 +16,7 @@ jobs:
             asset_name: gg-linux-arm64
           - target: bun-linux-x64
             asset_name: gg-linux-x64
-          -target: windows-x64
+          - target: windows-x64
             asset_name: gg-windows-x64.ext
           - target: darwin-arm64
             asset_name: gg-darwin-arm64
