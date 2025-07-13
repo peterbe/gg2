@@ -3,7 +3,6 @@
   "module": "index.ts",
   "version": "0.1.6",
   "type": "module",
-  "private": true,
   "scripts": {
     "lint": "biome check --write --unsafe",
     "lint:check": "biome check",
@@ -11,7 +10,7 @@
     "build:linux-arm64": "bun build src/index.ts --target=bun-linux-arm64 --outfile out/gg-linux-arm64 --compile",
     "prepare": "husky",
     "test": "bun test",
-    "release": "np"
+    "release": "np --no-tests"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
