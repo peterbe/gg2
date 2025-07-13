@@ -135,7 +135,6 @@ export async function commitBranch(options: Options) {
 
     if (pr) {
       bold(pr.html_url)
-      // console.log("\nPR details...")
 
       const prDetails = await getPRDetailsByNumber(pr.number)
 
@@ -143,28 +142,6 @@ export async function commitBranch(options: Options) {
       const { message, canMerge } = interpretMergeableStatus(prDetails)
       if (canMerge) success(message)
       else warn(message)
-
-      // type PullRequestResponse =
-      //   Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}"]["response"]
-
-      // type PullRequestData = PullRequestResponse["data"]
-
-      // type PullRequestKeys = keyof PullRequestData
-      // const KEYS = [
-      //   "title",
-      //   "mergeable_state",
-      //   "mergeable",
-      // ] as PullRequestKeys[]
-      // const longestKey = Math.max(...KEYS.map((key) => key.length))
-      // const padding = Math.max(30, longestKey) + 1
-
-      // for (const key of KEYS) {
-      //   const value = prDetails[key]
-      //   console.log(
-      //     kleur.bold(`${key}:`.padEnd(padding, " ")),
-      //     typeof value === "string" ? kleur.italic(value) : value,
-      //   )
-      // }
     } else {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 

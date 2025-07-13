@@ -80,7 +80,7 @@ program // alias for `github pr`
 
 const gitHubCommand = program
   .command("github")
-  .description("Configure your connecto to GitHub")
+  .description("Configure your connection to GitHub")
 
 gitHubCommand
   .command("token")
