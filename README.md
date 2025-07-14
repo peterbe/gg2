@@ -7,15 +7,19 @@ CLI tool for creating, committing, and generally managing your git branches.
 The source code for this CLI is written in TypeScript.
 
 The code is **compiled** using [`bun`](https://bun.com/docs/bundler/executables) to
-an executable that is compiled specifically for your operating system. For example,
-`bun-darwin-arm64`. Because it's compiled to **a single binary executable**, the start-up time to run the CLI is **very fast**.
+an executable that is compiled specifically for your operating system, for example,
+`bun-darwin-arm64`. Because it's compiled to **a single executable binary**, the
+start-up time to run the CLI is **very fast**. ⚡
 
 For example, the GitHub CLI, `gh`, is written in Go and is also compiled to a single
-executable binary. For comparison, running the [`hyperfine` command-line benchmarking tool](https://github.com/sharkdp/hyperfine) using:
+executable binary. For comparison, running the [`hyperfine` command-line
+benchmarking tool](https://github.com/sharkdp/hyperfine) using:
 
 ```bash
 hyperfine "gg --version" "gh --version"
 ```
+
+Results:
 
 ```text
 Benchmark 1: gg --version
@@ -31,7 +35,7 @@ Summary
     1.17 ± 0.04 times faster than gh --version
 ```
 
-The point is; it takes on average 25 milliseconds to execute the `gg --version` command.
+The point is; it takes on average **25 milliseconds** to run the `gg --version` command.
 
 ## Development
 
