@@ -33,7 +33,7 @@ jobs:
       - run: bun install
       - name: Build
         run: |
-          bun build src/index.ts --compile --target=${{ matrix.target.target }} --outfile out/${{ matrix.target.asset_name }}
+          bun build src/index.ts --compile --minify --sourcemap --bytecode --target=${{ matrix.target.target }} --outfile out/${{ matrix.target.asset_name }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
