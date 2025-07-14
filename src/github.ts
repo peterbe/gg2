@@ -11,11 +11,11 @@ import {
 import { success, warn } from "./logger"
 import { getGlobalConfig, storeGlobalConfig } from "./storage"
 
-type Options = {
+type TokenOptions = {
   test?: boolean
 }
 
-export async function gitHubToken(token: string, options: Options) {
+export async function gitHubToken(token: string, options: TokenOptions) {
   const config = await getGlobalConfig()
 
   if (!token && config["github-token"] && options.test) {
@@ -46,7 +46,12 @@ async function testToken(token: string): Promise<void> {
   success("The current stored GitHub token is working")
 }
 
-export async function gitHubPR() {
+type PROptions = {
+  watch?: boolean
+}
+
+export async function gitHubPR(options: PROptions) {
+  const watch = Boolean(options.watch)
   const git = simpleGit()
   const branchSummary = await git.branch()
   const currentBranch = branchSummary.current
@@ -75,4 +80,39 @@ export async function gitHubPR() {
   const { message, canMerge } = interpretMergeableStatus(prDetails)
   if (canMerge) success(message)
   else warn(message)
+
+  if (watch) {
+    let previousMessage = message
+    let previousCanMerge = canMerge
+    let attempts = 0
+    const SLEEP_TIME_SECONDS = 5
+    while (true) {
+      console.log(
+        `Watching (checking every ${SLEEP_TIME_SECONDS} seconds, attempt number ${attempts + 1})...`,
+      )
+      await sleep(SLEEP_TIME_SECONDS * 1000)
+      const prDetails = await getPRDetailsByNumber(pr.number)
+      const { message, canMerge } = interpretMergeableStatus(prDetails)
+      console.clear()
+      console.log(kleur.bold(`PR Title: ${prDetails.title}`))
+      if (canMerge) success(message)
+      else warn(message)
+
+      if (message !== previousMessage || canMerge !== previousCanMerge) {
+        success("Output changed, so quitting the watch")
+        break
+      }
+      previousMessage = message
+      previousCanMerge = canMerge
+      attempts++
+      if (attempts > 100) {
+        warn(`Sorry. Giving up on the PR watch after ${attempts} attempts.`)
+        break
+      }
+    }
+  }
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
