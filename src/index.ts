@@ -88,6 +88,10 @@ gitHubCommand
   .argument("[token]", "token")
   .description("Set your personal access token to GitHub")
   .option("--test", "Test if the existing token works")
+  .option(
+    "--test-prs",
+    "Test if you can read pull requests in the current repo",
+  )
   .action((token, options) => {
     wrap(gitHubToken(token, options), options.debug)
   })

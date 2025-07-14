@@ -42,5 +42,5 @@ jobs:
           file: out/${{ matrix.target.asset_name }}
           asset_name: ${{ matrix.target.asset_name }}
           tag: ${{ github.ref }}
-          overwrite: true
-          body: "Binary release for ${{ matrix.target.target }}"
+          # overwrite: true
+          # body: "Binary release for ${{ matrix.target.target }}"
