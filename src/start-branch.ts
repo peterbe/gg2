@@ -6,7 +6,10 @@ import { getRepoConfig, storeTitle } from "./storage"
 
 type Options = { [k: string]: never }
 
-export async function startBranch(url: string | undefined, _options: Options) {
+export async function startBranch(
+  url: string[] | undefined,
+  _options: Options,
+) {
   const title = await getTitle(url)
   let branchName = slugifyTitleToBranchName(title)
   const config = await getRepoConfig()
