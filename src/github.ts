@@ -92,6 +92,7 @@ export async function gitHubPR(options: PROptions) {
       const prDetails = await getPRDetailsByNumber(pr.number)
       const { message, canMerge } = interpretMergeableStatus(prDetails)
       console.clear()
+      console.log(kleur.bold(`PR Title: ${prDetails.title}`))
       if (canMerge) success(message)
       else warn(message)
 
