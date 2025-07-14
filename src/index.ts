@@ -74,8 +74,9 @@ program
 program // alias for `github pr`
   .command("pr")
   .description("Get the current GitHub Pull Request for the current branch")
+  .option("--watch", "Keep checking the status till it changes")
   .action((options) => {
-    wrap(gitHubPR(), options.debug)
+    wrap(gitHubPR(options), options.debug)
   })
 
 const gitHubCommand = program
@@ -94,8 +95,9 @@ gitHubCommand
 gitHubCommand
   .command("pr")
   .description("Get the current GitHub Pull Request for the current branch")
+  .option("--watch", "Keep checking the status till it changes")
   .action((options) => {
-    wrap(gitHubPR(), options.debug)
+    wrap(gitHubPR(options), options.debug)
   })
 
 program.parse()
