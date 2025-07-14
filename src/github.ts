@@ -57,7 +57,6 @@ async function testToken(token: string, options: TokenOptions): Promise<void> {
       success(`Found ${prs.length} open PRs which means it was able to connect`)
     } catch (err) {
       if (err instanceof Error && err.message.startsWith("Not Found")) {
-        // console.log({ messsage: err.message, NAME: err.name })
         error(
           "It did not work. The GitHub repo could not be found. That most likely means that token does not have read-access permission.",
         )

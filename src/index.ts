@@ -21,18 +21,12 @@ program
   .command("start")
   .description("Create a new branch")
   .option("--debug", "Debug mode (shows traceback)")
-  .argument("[url]", "GitHub or Jira ticket URL")
-  .action((url, options) => {
-    if (url) {
-      throw new Error("Not implemented yet.")
-    }
-    // if (url) {
-    //     if (!URL.canParse(url)) {
-    //         console.error("Invalid URL provided.");
-    //         process.exit(1);
-    //     }
-    // }
-    wrap(startBranch(url, options), options.debug)
+  .argument(
+    "<url-or-title...>",
+    "GitHub or Jira ticket URL or just the title directly",
+  )
+  .action((urlOrTitle, options) => {
+    wrap(startBranch(urlOrTitle, options), options.debug)
   })
 
 program

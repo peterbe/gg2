@@ -4,7 +4,6 @@ import { success } from "./logger"
 import { slugifyTitleToBranchName } from "./slugify"
 import { getRepoConfig, storeTitle } from "./storage"
 
-// type Options = {}
 type Options = { [k: string]: never }
 
 export async function startBranch(url: string | undefined, _options: Options) {
@@ -24,9 +23,16 @@ export async function startBranch(url: string | undefined, _options: Options) {
   await storeTitle(branchName, title)
 }
 
-async function getTitle(url: string | undefined): Promise<string> {
-  if (url) {
-    throw new Error("Not implemented yet: parsing the URL to get the title")
+async function getTitle(urlOrTitle: string[] | undefined): Promise<string> {
+  if (urlOrTitle && urlOrTitle.length > 0) {
+    // If it looks like a URL, it's not implemented yet
+    if (
+      (urlOrTitle.length === 1 && URL.canParse(urlOrTitle[0] as string)) ||
+      (urlOrTitle.length === 1 && isInt(urlOrTitle[0] as string))
+    ) {
+      throw new Error("Not implemented yet: parsing the URL to get the title")
+    }
+    return urlOrTitle.join(" ")
   }
   const config = await getRepoConfig()
   const titlePrefix = config["title-prefix"]
@@ -36,4 +42,12 @@ async function getTitle(url: string | undefined): Promise<string> {
     prefill: "editable",
   })
   return title
+}
+
+function isInt(value: string) {
+  if (Number.isNaN(value)) {
+    return false
+  }
+  var x = parseFloat(value)
+  return (x | 0) === x
 }
