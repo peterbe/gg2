@@ -87,7 +87,9 @@ export async function gitHubPR(options: PROptions) {
     let attempts = 0
     const SLEEP_TIME_SECONDS = 5
     while (true) {
-      console.log(`Watching (checking every ${SLEEP_TIME_SECONDS} seconds)...`)
+      console.log(
+        `Watching (checking every ${SLEEP_TIME_SECONDS} seconds, attempt number ${attempts + 1})...`,
+      )
       await sleep(SLEEP_TIME_SECONDS * 1000)
       const prDetails = await getPRDetailsByNumber(pr.number)
       const { message, canMerge } = interpretMergeableStatus(prDetails)
@@ -97,6 +99,7 @@ export async function gitHubPR(options: PROptions) {
       else warn(message)
 
       if (message !== previousMessage || canMerge !== previousCanMerge) {
+        success("Output changed, so quitting the watch")
         break
       }
       previousMessage = message
