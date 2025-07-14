@@ -4,22 +4,24 @@ import { Octokit } from "octokit"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import {
-  getPRByBranchName,
+  findPRByBranchName,
+  getOwnerRepo,
   getPRDetailsByNumber,
   interpretMergeableStatus,
 } from "./github-utils"
-import { success, warn } from "./logger"
+import { error, success, warn } from "./logger"
 import { getGlobalConfig, storeGlobalConfig } from "./storage"
 
 type TokenOptions = {
   test?: boolean
+  testPrs?: boolean
 }
 
 export async function gitHubToken(token: string, options: TokenOptions) {
   const config = await getGlobalConfig()
 
-  if (!token && config["github-token"] && options.test) {
-    await testToken(config["github-token"])
+  if (!token && config["github-token"] && (options.test || options.testPrs)) {
+    await testToken(config["github-token"], options)
     return
   }
 
@@ -36,14 +38,38 @@ export async function gitHubToken(token: string, options: TokenOptions) {
     await storeGlobalConfig("github-token", token)
   }
 
-  await testToken(token)
+  await testToken(token, options)
 }
 
-async function testToken(token: string): Promise<void> {
+async function testToken(token: string, options: TokenOptions): Promise<void> {
   const octokit = new Octokit({ auth: token })
-  const { data: user } = await octokit.rest.users.getAuthenticated()
-  console.log(user)
-  success("The current stored GitHub token is working")
+  if (options.testPrs) {
+    const octokit = new Octokit({ auth: token })
+    const [owner, repo] = await getOwnerRepo()
+    try {
+      const { data: prs } = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        state: "open",
+        sort: "updated",
+        direction: "desc",
+      })
+      success(`Found ${prs.length} open PRs which means it was able to connect`)
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith("Not Found")) {
+        // console.log({ messsage: err.message, NAME: err.name })
+        error(
+          "It did not work. The GitHub repo could not be found. That most likely means that token does not have read-access permission.",
+        )
+      } else {
+        throw err
+      }
+    }
+  } else {
+    const { data: user } = await octokit.rest.users.getAuthenticated()
+    console.log(user)
+    success("The current stored GitHub token is working")
+  }
 }
 
 type PROptions = {
@@ -62,7 +88,7 @@ export async function gitHubPR(options: PROptions) {
     )
   }
 
-  const pr = await getPRByBranchName(currentBranch)
+  const pr = await findPRByBranchName(currentBranch)
   if (!pr) {
     warn("Pull request not found.")
     return

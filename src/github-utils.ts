@@ -22,7 +22,7 @@ export function getGitHubNWO(url: string): string | undefined {
   return url
 }
 
-export async function getPRByBranchName(branchName: string) {
+export async function findPRByBranchName(branchName: string) {
   const octokit = await getOctokit()
   const [owner, repo] = await getOwnerRepo()
   const { data: prs } = await octokit.rest.pulls.list({
@@ -38,7 +38,7 @@ export async function getPRByBranchName(branchName: string) {
   }
 }
 
-async function getOwnerRepo(): Promise<[string, string]> {
+export async function getOwnerRepo(): Promise<[string, string]> {
   const git = simpleGit()
   const remotes = await git.getRemotes(true) // true includes URLs
   const origin = remotes.find((remote) => remote.name === "origin")

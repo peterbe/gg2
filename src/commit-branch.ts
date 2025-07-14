@@ -3,8 +3,8 @@ import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import {
+  findPRByBranchName,
   getGitHubNWO,
-  getPRByBranchName,
   getPRDetailsByNumber,
   interpretMergeableStatus,
 } from "./github-utils"
@@ -131,7 +131,7 @@ export async function commitBranch(options: Options) {
   console.log("\n")
   const nwo = pushToRemote && originUrl && getGitHubNWO(originUrl)
   if (nwo) {
-    const pr = await getPRByBranchName(currentBranch)
+    const pr = await findPRByBranchName(currentBranch)
 
     if (pr) {
       bold(pr.html_url)
