@@ -22,7 +22,7 @@ program
   .description("Create a new branch")
   .option("--debug", "Debug mode (shows traceback)")
   .argument(
-    "<url-or-title...>",
+    "[url-or-title...]",
     "GitHub or Jira ticket URL or just the title directly",
   )
   .action((urlOrTitle, options) => {
