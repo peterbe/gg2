@@ -115,7 +115,7 @@ export async function findBranches(search: string, options: Options) {
       }
 
       if (checkOut) {
-        git.checkout(found.name)
+        await git.checkout(found.name)
         success(`Checked out branch ${kleur.bold(found.name)}`)
       }
     }
