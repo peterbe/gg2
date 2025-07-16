@@ -91,6 +91,11 @@ program
   .description("Find and check out a branch by name")
   .argument("[search]", "Search input (can be fuzzy)")
   .option("-n, --number <number>", "Max number of branches to show", "20")
+  .option(
+    "--cleanup",
+    "Interactively ask about deleting found and *merged* branches",
+  )
+  .option("--reverse", "Reverse sort order")
   .action((search, options) => {
     wrap(findBranches(search, options), options.debug)
   })
