@@ -3,6 +3,7 @@ import { Command } from "commander"
 import { version } from "../package.json"
 import { commitBranch } from "./commit-branch"
 import { configureRepo } from "./configure-repo"
+import { findBranches } from "./find-branches"
 import { getBack } from "./get-back"
 import { gitHubPR, gitHubToken } from "./github"
 import { error } from "./logger"
@@ -82,6 +83,16 @@ program
   )
   .action((options) => {
     wrap(mainMerge(), options.debug)
+  })
+
+program
+  .command("branch")
+  .alias("branches")
+  .description("Find and check out a branch by name")
+  .argument("[search]", "Search input (can be fuzzy)")
+  .option("-n, --number <number>", "Max number of branches to show", "20")
+  .action((search, options) => {
+    wrap(findBranches(search, options), options.debug)
   })
 
 const gitHubCommand = program
