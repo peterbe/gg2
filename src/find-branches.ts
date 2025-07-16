@@ -8,53 +8,54 @@ import { success, warn } from "./logger"
 type Options = {
   search?: string
   number: string
+  cleanup?: boolean
+  reverse?: boolean
 }
 export async function findBranches(search: string, options: Options) {
+  const cleanup = Boolean(options.cleanup)
   const number = Number.parseInt(options.number)
+  const reverse = Boolean(options.reverse)
   if (Number.isNaN(number)) {
     throw new Error("Not a number")
   }
 
   const git = simpleGit()
 
-  const raw = await git.raw(
+  const rawDates = await git.raw(
     "branch",
     "--all",
     "--format=%(refname:short)|%(committerdate:iso)",
   )
   const dates = new Map<string, Date>()
-  for (const line of raw.split(/\n+/g)) {
+  for (const line of rawDates.split(/\n+/g)) {
     const [refname, dateStr] = line.split("|")
     if (refname && dateStr) {
       dates.set(refname, new Date(dateStr))
     }
   }
 
-  // function printFoundBranch(name: string, highlit?: string) {
-  //   console.log(highlit || name, dates.get(name))
-  // }
+  const isMerged = new Set<string>()
+  const rawMerged = await git.raw("branch", "--all", "--merged")
+  for (const line of rawMerged.split(/\n+/g)) {
+    if (line.trim()) {
+      isMerged.add(line.trim())
+    }
+  }
 
   const branchSummary = await git.branch([
     "--all",
-    "--sort=-committerdate",
-    // '--format="%(refname) %(committerdate)"',
+    reverse ? "--sort=committerdate" : "--sort=-committerdate",
   ])
-  // const branches = await git.branchLocal()
-  // const branches = await git.branch([
-  //   "--all",
-  //   "--sort=-committerdate",
-  //   "--format=%(refname:short) %(committerdate:short)",
-  // ])
-  // console.log(branches)
 
   type SearchResult = {
     name: string
     highlit?: string
     branchInfo?: BranchSummaryBranch
+    merged: boolean
   }
 
-  function printSearchResults(searchResults: SearchResult[]) {
-    for (const { name, highlit, branchInfo } of searchResults) {
+  async function printSearchResults(searchResults: SearchResult[]) {
+    for (const { name, highlit, branchInfo, merged } of searchResults) {
       const date = dates.get(name)
       console.log(
         `${date ? kleur.dim(`${getHumanAge(date)} ago`) : kleur.italic("no date")}`.padEnd(
@@ -64,8 +65,21 @@ export async function findBranches(search: string, options: Options) {
         highlit || name,
         branchInfo?.current
           ? kleur.bold().green("   (Your current branch)")
-          : "",
+          : merged
+            ? kleur.cyan("  (merged already)")
+            : "",
       )
+
+      if (cleanup) {
+        const doDelete = await confirm({
+          message: `Delete this branch locally?`,
+          default: false,
+        })
+        if (doDelete) {
+          await git.deleteLocalBranch(name)
+          success(`Deleted branch ${kleur.bold(name)}\n`)
+        }
+      }
     }
   }
 
@@ -77,6 +91,13 @@ export async function findBranches(search: string, options: Options) {
   const searchResults: SearchResult[] = []
   for (const branch of foundBranchNames) {
     const branchInfo = branchSummary.branches[branch]
+
+    const merged = isMerged.has(branch)
+
+    if (cleanup && !merged) {
+      continue
+    }
+
     if (search) {
       const matched = fuzzysort.single(search, branch)
       if (!matched) {
@@ -88,16 +109,21 @@ export async function findBranches(search: string, options: Options) {
         name: branch,
         highlit: matched.highlight("\x1b[1m", "\x1b[0m"),
         branchInfo,
+        merged,
       })
     } else {
-      searchResults.push({ name: branch, branchInfo })
+      searchResults.push({
+        name: branch,
+        branchInfo,
+        merged,
+      })
     }
     countFound++
   }
   if (!countFound) {
     warn("Found nothing")
   } else {
-    printSearchResults(searchResults)
+    await printSearchResults(searchResults)
   }
 
   if (countFound === 1) {
