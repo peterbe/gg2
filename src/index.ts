@@ -6,6 +6,7 @@ import { configureRepo } from "./configure-repo"
 import { getBack } from "./get-back"
 import { gitHubPR, gitHubToken } from "./github"
 import { error } from "./logger"
+import { mainMerge } from "./main-merge"
 import { repoConfig } from "./repo-config"
 import { startBranch } from "./start-branch"
 
@@ -71,6 +72,16 @@ program // alias for `github pr`
   .option("--watch", "Keep checking the status till it changes")
   .action((options) => {
     wrap(gitHubPR(options), options.debug)
+  })
+
+program
+  .command("mainmerge")
+  .alias("mastermerge")
+  .description(
+    "Merge the origin_name/default_branch into the the current branch",
+  )
+  .action((options) => {
+    wrap(mainMerge(), options.debug)
   })
 
 const gitHubCommand = program
