@@ -145,7 +145,11 @@ export async function commitBranch(options: Options) {
     } else {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
 
-      bold(`https://github.com/${nwo}/pull/new/${currentBranch}`)
+      console.log(
+        kleur
+          .bold()
+          .green(`https://github.com/${nwo}/pull/new/${currentBranch}`),
+      )
     }
     console.log("(⌘-click to open URLs)")
   }

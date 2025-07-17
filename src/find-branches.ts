@@ -59,7 +59,7 @@ export async function findBranches(search: string, options: Options) {
       const date = dates.get(name)
       console.log(
         `${date ? kleur.dim(`${getHumanAge(date)} ago`) : kleur.italic("no date")}`.padEnd(
-          20,
+          30,
           " ",
         ),
         highlit || name,
