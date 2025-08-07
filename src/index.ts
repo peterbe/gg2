@@ -8,6 +8,7 @@ import { getBack } from "./get-back"
 import { gitHubPR, gitHubToken } from "./github"
 import { error } from "./logger"
 import { mainMerge } from "./main-merge"
+import { originPush } from "./origin-push"
 import { repoConfig } from "./repo-config"
 import { startBranch } from "./start-branch"
 
@@ -65,6 +66,14 @@ program
   .option("-y, --yes", "Push")
   .action((options) => {
     wrap(getBack(options), options.debug)
+  })
+
+program
+  .command("push")
+  .description("Push the current branch to the remote")
+  .option("--debug", "Debug mode (shows traceback)")
+  .action((options) => {
+    wrap(originPush(options), options.debug)
   })
 
 program // alias for `github pr`
