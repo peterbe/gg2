@@ -2,6 +2,7 @@ import { confirm } from "@inquirer/prompts"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { success, warn } from "./logger"
+import { getUpstreamName } from "./storage"
 
 type Options = {
   yes?: boolean
@@ -24,8 +25,10 @@ export async function getBack(options: Options) {
 
   await git.checkout(defaultBranch)
 
+  const upstreamName = await getUpstreamName()
+
   const remotes = await git.getRemotes(true)
-  const origin = remotes.find((remote) => remote.name === "origin")
+  const origin = remotes.find((remote) => remote.name === upstreamName)
   if (origin) {
     await git.pull(origin.name, defaultBranch)
   }

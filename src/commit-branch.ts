@@ -10,7 +10,7 @@ import {
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { bold, success, warn } from "./logger"
-import { getTitle } from "./storage"
+import { getTitle, getUpstreamName } from "./storage"
 
 type Options = {
   verify?: boolean
@@ -73,10 +73,12 @@ export async function commitBranch(options: Options) {
     throw new Error("No title provided. Please provide a title for the commit.")
   }
 
+  const upstreamName = await getUpstreamName()
+
   const remotes = await git.getRemotes(true) // true includes URLs
-  const origin = remotes.find((remote) => remote.name === "origin")
+  const origin = remotes.find((remote) => remote.name === upstreamName)
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
-  const originName = origin ? origin.name : "origin"
+  const originName = origin ? origin.name : upstreamName
 
   const unstagedFiles = await getUnstagedFiles(git)
   await git.add(unstagedFiles)
@@ -107,7 +109,7 @@ export async function commitBranch(options: Options) {
       error instanceof Error &&
       error.message.includes("nothing to commit, working tree clean")
     ) {
-      await git.push("origin", currentBranch)
+      await git.push(upstreamName, currentBranch)
       success(`Changes pushed to ${originName}/${currentBranch}`)
     } else {
       throw error
@@ -123,7 +125,7 @@ export async function commitBranch(options: Options) {
   }
 
   if (pushToRemote) {
-    await git.push("origin", currentBranch)
+    await git.push(upstreamName, currentBranch)
     success(`Changes pushed to ${originName}/${currentBranch}`)
   } else {
     success("Changes committed but not pushed.")

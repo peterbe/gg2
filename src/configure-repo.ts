@@ -16,12 +16,16 @@ export async function configureRepo() {
     message: `What do you want to configure (for repo: ${repoName})`,
     choices: [
       {
-        name: "common branch prefix",
+        name: "Common branch prefix",
         value: "branch-prefix",
       },
       {
-        name: "common title prefix",
+        name: "Common title prefix",
         value: "title-prefix",
+      },
+      {
+        name: "Upstream name",
+        value: "upstream-name",
       },
 
       //   {
@@ -46,6 +50,8 @@ export async function configureRepo() {
     await configureBranchPrefix()
   } else if (answer === "title-prefix") {
     await configureTitlePrefix()
+  } else if (answer === "upstream-name") {
+    await configureUpstreamName()
   } else {
     warn("No selected thing to configure. Bye")
   }
@@ -76,10 +82,27 @@ async function configureTitlePrefix() {
     default: defaultPrefix,
     prefill: "tab",
   })
-  //   console.log({ prefix });
   await storeConfig("title-prefix", value)
   console.log(
     `Old value: ${config["title-prefix"] ? kleur.yellow(config["title-prefix"]) : kleur.italic("nothing set")}`,
+  )
+  console.log(
+    `New value: ${value ? kleur.green(value) : kleur.italic("empty")}`,
+  )
+}
+
+async function configureUpstreamName() {
+  const KEY = "upstream-name"
+  const config = await getRepoConfig()
+  const defaultName = config[KEY] || "origin"
+  const value = await input({
+    message: `Name:`,
+    default: defaultName,
+    prefill: "tab",
+  })
+  await storeConfig(KEY, value)
+  console.log(
+    `Old value: ${config[KEY] ? kleur.yellow(config[KEY]) : kleur.italic("nothing set")}`,
   )
   console.log(
     `New value: ${value ? kleur.green(value) : kleur.italic("empty")}`,

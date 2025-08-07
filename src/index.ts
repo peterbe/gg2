@@ -73,7 +73,7 @@ program
   .description("Push the current branch to the remote")
   .option("--debug", "Debug mode (shows traceback)")
   .action((options) => {
-    wrap(originPush(options), options.debug)
+    wrap(originPush(), options.debug)
   })
 
 program // alias for `github pr`
