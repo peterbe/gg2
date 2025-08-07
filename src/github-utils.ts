@@ -38,6 +38,52 @@ export async function findPRByBranchName(branchName: string) {
   }
 }
 
+export async function createGitHubPR({
+  head,
+  base,
+  title,
+  body,
+  draft = false,
+}: {
+  head: string
+  base: string
+  title: string
+  body: string
+  draft?: boolean
+}) {
+  const octokit = await getOctokit()
+  const [owner, repo] = await getOwnerRepo()
+  const { data } = await octokit.rest.pulls.create({
+    owner,
+    repo,
+    title,
+    head,
+    base,
+    body,
+    draft,
+  })
+
+  return data
+}
+
+// export async function enablePRAutoMerge({ prNumber, title, message = '', mergeMethod = 'merge' }: {
+//   prNumber: number,
+//   title: string,
+//   message?: string
+//   mergeMethod?: "merge" | "squash" | "rebase"   }) {
+//   const octokit = await getOctokit()
+//   const [owner, repo] = await getOwnerRepo()
+//   const { data } = await octokit.rest.pulls.createAutoMerge({
+//     owner,
+//     repo,
+//     pull_number: prNumber,
+//     merge_method: mergeMethod,
+//     commit_title: title
+//     commit_message: message
+//   })
+//   return data
+// }
+
 export async function getOwnerRepo(): Promise<[string, string]> {
   const git = simpleGit()
   const upstreamName = await getUpstreamName()
