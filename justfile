@@ -31,5 +31,8 @@ outdated:
 test:
     bun test
 
+release:
+    bun run release
+
 # alias
 upgrade: outdated
