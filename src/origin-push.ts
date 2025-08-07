@@ -2,8 +2,8 @@ import kleur from "kleur"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { findPRByBranchName, getGitHubNWO } from "./github-utils"
-import { bold, success, warn } from "./logger"
-import { getRepoConfig } from "./storage"
+import { bold, success } from "./logger"
+import { getUpstreamName } from "./storage"
 
 export async function originPush() {
   const git = simpleGit()
@@ -20,23 +20,17 @@ export async function originPush() {
     throw new Error("Current branch is not in a clean state. Run `git status`")
   }
 
-  const config = await getRepoConfig()
-
-  let upstreamName = config.upstreamName
-  if (!upstreamName) {
-    warn("No upstream name configured, defaulting to 'origin'")
-    upstreamName = "origin"
-  }
+  const upstreamName = await getUpstreamName()
 
   const remotes = await git.getRemotes(true) // true includes URLs
   const origin = remotes.find((remote) => remote.name === upstreamName)
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   if (!origin?.name) {
-    throw new Error("Could not find a remote called 'origin'")
+    throw new Error(`Could not find a remote called '${upstreamName}'`)
   }
   const originName = origin.name
 
-  await git.push("origin", currentBranch)
+  await git.push(upstreamName, currentBranch)
   success(`Changes pushed to ${originName}/${currentBranch}`)
 
   const nwo = originUrl && getGitHubNWO(originUrl)

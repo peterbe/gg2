@@ -2,6 +2,7 @@ import { homedir } from "node:os"
 import { sep } from "node:path"
 
 import simpleGit from "simple-git"
+import { warn } from "./logger"
 
 const db = Bun.file(expandPath("~/.gg.json"))
 
@@ -18,7 +19,7 @@ export async function storeTitle(
 //   [key: string]: string
 // }
 
-type ConfigKeys = "branch-prefix" | "title-prefix" // more to come!
+type ConfigKeys = "branch-prefix" | "title-prefix" | "upstream-name" // more to come!
 
 type GlobalConfigKeys = "github-token" // more to come
 
@@ -107,4 +108,16 @@ export async function storeGlobalConfig(key: GlobalConfigKeys, value: string) {
   const data = await getData()
   data.GLOBAL_CONFIG[key] = value
   await db.write(JSON.stringify(data, null, 2))
+}
+
+export async function getUpstreamName(): Promise<string> {
+  const config = await getRepoConfig()
+
+  let upstreamName = config["upstream-name"]
+  if (!upstreamName) {
+    warn("No upstream name configured, defaulting to 'origin'")
+    upstreamName = "origin"
+  }
+
+  return upstreamName
 }

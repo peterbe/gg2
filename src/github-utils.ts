@@ -1,6 +1,6 @@
 import { Octokit } from "octokit"
 import simpleGit from "simple-git"
-import { getGlobalConfig } from "./storage"
+import { getGlobalConfig, getUpstreamName } from "./storage"
 
 export function getGitHubNWO(url: string): string | undefined {
   // E.g. git@github.com:peterbe/admin-peterbecom.gi
@@ -40,8 +40,9 @@ export async function findPRByBranchName(branchName: string) {
 
 export async function getOwnerRepo(): Promise<[string, string]> {
   const git = simpleGit()
+  const upstreamName = await getUpstreamName()
   const remotes = await git.getRemotes(true) // true includes URLs
-  const origin = remotes.find((remote) => remote.name === "origin")
+  const origin = remotes.find((remote) => remote.name === upstreamName)
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   if (!originUrl) {
     throw new Error(
