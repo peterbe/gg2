@@ -52,6 +52,7 @@ export async function createGitHubPR({
   draft?: boolean
 }) {
   const octokit = await getOctokit()
+  console.log(`Creating PR from ${head} to ${base} with title "${title}"`)
   const [owner, repo] = await getOwnerRepo()
   const { data } = await octokit.rest.pulls.create({
     owner,
@@ -116,7 +117,7 @@ async function getOctokit() {
       "You have not set up a GitHub Personal Access Token. Run `github token`.",
     )
   }
-
+  console.log("Using GitHub token:", token)
   const octokit = new Octokit({ auth: token })
   return octokit
 }
