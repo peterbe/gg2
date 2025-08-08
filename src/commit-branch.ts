@@ -141,7 +141,7 @@ export async function commitBranch(options: Options) {
 
       // Force a slight delay because sometimes it says the PR is
       // ready to merge, even though you've just pushed more commits.
-      await sleep(1000)
+      await sleep(2000)
 
       let prDetails = await getPRDetailsByNumber(pr.number)
       let retries = 3
