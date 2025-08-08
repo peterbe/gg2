@@ -1,8 +1,9 @@
 import { input } from "@inquirer/prompts"
+import kleur from "kleur"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { createGitHubPR, findPRByBranchName } from "./github-utils"
-import { error, warn } from "./logger"
+import { warn } from "./logger"
 import { getTitle } from "./storage"
 
 type PROptions = {
@@ -11,6 +12,11 @@ type PROptions = {
 
 export async function createPR(options: PROptions) {
   const enableAutoMerge = Boolean(options.enableAutoMerge)
+
+  if (enableAutoMerge) {
+    throw new Error("Not implemented yet")
+  }
+
   const git = simpleGit()
   const branchSummary = await git.branch()
   const currentBranch = branchSummary.current
@@ -28,7 +34,8 @@ export async function createPR(options: PROptions) {
 
   const pr = await findPRByBranchName(currentBranch)
   if (pr) {
-    error("There is already a PR for this branch.")
+    warn("There is already a PR for this branch.")
+    console.log(kleur.bold().green(pr.html_url))
     return
   }
 
@@ -43,11 +50,12 @@ export async function createPR(options: PROptions) {
     body: "",
     draft: false,
   })
-  console.log("Pull request created:", data.html_url)
+  console.log("Pull request created:")
+  console.log(kleur.bold().green(data.html_url))
+  console.log("(⌘-click to open URLs)")
 
   // const prNumber = data.number
-  if (enableAutoMerge) {
-    warn("Enabling auto-merge is not yet implemented.")
-    // const data = await enablePRAutoMerge({ prNumber })
-  }
+  // if (enableAutoMerge) {
+  // const data = await enablePRAutoMerge({ prNumber })
+  // }
 }
