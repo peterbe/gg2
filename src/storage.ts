@@ -115,7 +115,9 @@ export async function getUpstreamName(): Promise<string> {
 
   let upstreamName = config["upstream-name"]
   if (!upstreamName) {
-    warn("No upstream name configured, defaulting to 'origin'")
+    warn(
+      "No upstream name configured, defaulting to 'origin' (run 'gg configure' to set it)",
+    )
     upstreamName = "origin"
   }
 

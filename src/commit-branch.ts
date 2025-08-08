@@ -9,7 +9,7 @@ import {
   interpretMergeableStatus,
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
-import { bold, success, warn } from "./logger"
+import { success, warn } from "./logger"
 import { getTitle, getUpstreamName } from "./storage"
 
 type Options = {
@@ -136,9 +136,20 @@ export async function commitBranch(options: Options) {
     const pr = await findPRByBranchName(currentBranch)
 
     if (pr) {
-      bold(pr.html_url)
+      console.log(kleur.bold(pr.html_url))
 
-      const prDetails = await getPRDetailsByNumber(pr.number)
+      // Force a slight delay because sometimes it says the PR is
+      // ready to merge, even though you've just pushed more commits.
+      await sleep(1000)
+
+      let prDetails = await getPRDetailsByNumber(pr.number)
+      let retries = 3
+      while (prDetails.mergeable_state === "unknown" && retries--) {
+        warn(`PR mergeable state is unknown. Trying again... (${retries})`)
+        // Wait a bit and try again
+        await sleep(2000)
+        prDetails = await getPRDetailsByNumber(pr.number)
+      }
 
       console.log(kleur.bold(`PR Title: ${prDetails.title}`))
       const { message, canMerge } = interpretMergeableStatus(prDetails)
@@ -175,4 +186,8 @@ async function printUnTrackedFiles(files: string[]) {
     const age = getHumanAge(stats.mtime)
     console.log(`${filePath.padEnd(longestFileName + 10, " ")}  ${age} old`)
   }
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

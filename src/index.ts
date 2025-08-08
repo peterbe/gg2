@@ -3,6 +3,7 @@ import { Command } from "commander"
 import { version } from "../package.json"
 import { commitBranch } from "./commit-branch"
 import { configureRepo } from "./configure-repo"
+import { createPR } from "./create-pr"
 import { findBranches } from "./find-branches"
 import { getBack } from "./get-back"
 import { gitHubPR, gitHubToken } from "./github"
@@ -132,6 +133,14 @@ gitHubCommand
   .option("--watch", "Keep checking the status till it changes")
   .action((options) => {
     wrap(gitHubPR(options), options.debug)
+  })
+
+gitHubCommand
+  .command("create")
+  .description("Turn the current branch into a GitHub Pull Request")
+  .option("-e, --enable-auto-merge", "Keep checking the status till it changes")
+  .action((options) => {
+    wrap(createPR(options), options.debug)
   })
 
 program.parse()
