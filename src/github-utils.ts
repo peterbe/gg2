@@ -117,7 +117,7 @@ async function getOctokit() {
       "You have not set up a GitHub Personal Access Token. Run `github token`.",
     )
   }
-  console.log("Using GitHub token:", token)
+
   const octokit = new Octokit({ auth: token })
   return octokit
 }
