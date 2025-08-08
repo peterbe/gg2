@@ -10,7 +10,3 @@ export function error(...args: string[]) {
 export function warn(...args: string[]) {
   console.warn(...args.map((arg) => kleur.yellow(arg)))
 }
-
-export function bold(...args: string[]) {
-  console.log(...args.map((arg) => kleur.bold(arg)))
-}

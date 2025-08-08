@@ -9,7 +9,7 @@ import {
   interpretMergeableStatus,
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
-import { bold, success, warn } from "./logger"
+import { success, warn } from "./logger"
 import { getTitle, getUpstreamName } from "./storage"
 
 type Options = {
@@ -136,7 +136,7 @@ export async function commitBranch(options: Options) {
     const pr = await findPRByBranchName(currentBranch)
 
     if (pr) {
-      bold(pr.html_url)
+      console.log(kleur.bold(pr.html_url))
 
       const prDetails = await getPRDetailsByNumber(pr.number)
 

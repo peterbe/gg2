@@ -35,7 +35,7 @@ export async function createPR(options: PROptions) {
   const pr = await findPRByBranchName(currentBranch)
   if (pr) {
     warn("There is already a PR for this branch.")
-    console.log(kleur.bold().green(pr.html_url))
+    console.log(kleur.bold(pr.html_url))
     return
   }
 

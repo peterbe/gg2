@@ -2,7 +2,7 @@ import kleur from "kleur"
 import simpleGit from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { findPRByBranchName, getGitHubNWO } from "./github-utils"
-import { bold, success } from "./logger"
+import { success } from "./logger"
 import { getUpstreamName } from "./storage"
 
 export async function originPush() {
@@ -39,7 +39,7 @@ export async function originPush() {
 
     console.log("") // just a spacer
     if (pr) {
-      bold(pr.html_url)
+      console.log(kleur.bold(pr.html_url))
     } else {
       console.log(
         kleur
