@@ -138,6 +138,10 @@ export async function commitBranch(options: Options) {
     if (pr) {
       console.log(kleur.bold(pr.html_url))
 
+      // Force a slight delay because sometimes it says the PR is
+      // ready to merge, even though you've just pushed more commits.
+      await sleep(1000)
+
       const prDetails = await getPRDetailsByNumber(pr.number)
 
       console.log(kleur.bold(`PR Title: ${prDetails.title}`))
@@ -175,4 +179,8 @@ async function printUnTrackedFiles(files: string[]) {
     const age = getHumanAge(stats.mtime)
     console.log(`${filePath.padEnd(longestFileName + 10, " ")}  ${age} old`)
   }
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
