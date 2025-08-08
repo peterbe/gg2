@@ -136,22 +136,22 @@ export async function commitBranch(options: Options) {
     const pr = await findPRByBranchName(currentBranch)
 
     if (pr) {
-      console.log(kleur.bold(pr.html_url))
+      console.log(kleur.bold(pr.title))
+      console.log(kleur.bold().green(pr.html_url))
 
       // Force a slight delay because sometimes it says the PR is
       // ready to merge, even though you've just pushed more commits.
-      await sleep(1000)
+      await sleep(2000)
 
       let prDetails = await getPRDetailsByNumber(pr.number)
       let retries = 3
-      while (prDetails.mergeable_state === "unknown" && retries--) {
+      while (prDetails.mergeable_state === "unknown" && retries-- > 0) {
         warn(`PR mergeable state is unknown. Trying again... (${retries})`)
         // Wait a bit and try again
         await sleep(2000)
         prDetails = await getPRDetailsByNumber(pr.number)
       }
 
-      console.log(kleur.bold(`PR Title: ${prDetails.title}`))
       const { message, canMerge } = interpretMergeableStatus(prDetails)
       if (canMerge) success(message)
       else warn(message)
