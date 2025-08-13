@@ -16,6 +16,8 @@ export async function originPush() {
   }
 
   const status = await git.status()
+  // XXX It will say it's not clean if all you have is a new file
+  // that hasn't been staged yet. Make it prompt for override?
   if (!status.isClean()) {
     throw new Error("Current branch is not in a clean state. Run `git status`")
   }

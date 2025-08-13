@@ -11,6 +11,7 @@ import { error } from "./logger"
 import { mainMerge } from "./main-merge"
 import { originPush } from "./origin-push"
 import { repoConfig } from "./repo-config"
+import { printCompletions, shellCompletion } from "./shell-completion"
 import { startBranch } from "./start-branch"
 
 const program = new Command()
@@ -18,8 +19,22 @@ const program = new Command()
 program
   .name("gg")
   .description("CLI to make it easier to manage git branches")
-  //   .option("--debug", "Debug mode")
   .version(version)
+
+program
+  .command("shell-completion")
+  .argument("[search]", "Search input")
+  .option("--list", "List all options")
+  .description(
+    "Prints the Bash and Zsh completion code that your shell can eval",
+  )
+  .action((search, options) => {
+    if (options.list) {
+      wrap(printCompletions({ search, program }), options.debug)
+    } else {
+      wrap(shellCompletion(), options.debug)
+    }
+  })
 
 program
   .command("start")

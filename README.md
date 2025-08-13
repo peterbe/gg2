@@ -2,6 +2,31 @@
 
 CLI tool for creating, committing, and generally managing your git branches.
 
+## Installation
+
+For Linux, download a relase file for your OS on https://github.com/peterbe/gg2/releases
+
+For macOS, right now you can't install with Homebrew and your operating system
+won't allow you to download an executable from GitHub and run it. Simplest is to
+clone the repo and compile it yourself:
+
+```sh
+git clone https://github.com/peterbe/gg2.git && cd gg2
+bun install
+bun run build
+cp out/gg ~/bin
+chmod +x ~/bin/gg
+```
+
+For **bash/zsh autocompletion** add this to your `~/.bashrc` or `~/.zshrc` file:
+
+```sh
+source <(gg shell-completion)
+```
+
+Now, you should be able to type `gg [TAB]` and see all options.
+
+
 ## Compiled
 
 The source code for this CLI is written in TypeScript.
