@@ -160,10 +160,11 @@ gitHubCommand
   })
 
 program
-  .command("_parentbranch")
+  .command("parentbranch")
   .description("Print out the current branch's parent")
+  .option("-y, --yes", "Push")
   .action((options) => {
-    wrap(parentBranch(), options.debug)
+    wrap(parentBranch(options), options.debug)
   })
 
 program.parse()

@@ -1,8 +1,14 @@
+import { confirm } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit from "simple-git"
-import { warn } from "./logger"
+import { success, warn } from "./logger"
 
-export async function parentBranch() {
+type Options = {
+  yes?: boolean
+}
+
+export async function parentBranch(options: Options) {
+  const yes = Boolean(options.yes)
   const git = simpleGit()
   const branchSummary = await git.branch()
   const currentBranch = branchSummary.current
@@ -26,8 +32,26 @@ export async function parentBranch() {
   if (parents.length >= 1 && parents[0]) {
     const parentBranch = parents[0]
     console.log(
-      `Parent branch for ${currentBranch} is: ${kleur.bold(parentBranch)}`,
+      `Parent branch for ${currentBranch} is: ${kleur.bold().green(parentBranch)}`,
     )
+    console.log("")
+    const checkOut =
+      yes ||
+      (await confirm({
+        message: `Check out (${parentBranch}):`,
+        default: true,
+      }))
+    const status = await git.status()
+    if (!status.isClean()) {
+      throw new Error(
+        "Current branch is not in a clean state. Run `git status`",
+      )
+    }
+
+    if (checkOut) {
+      await git.checkout(parentBranch)
+      success(`Checked out branch ${kleur.bold(parentBranch)}`)
+    }
   } else {
     warn("Unable to find any parents")
   }
