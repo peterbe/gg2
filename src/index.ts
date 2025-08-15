@@ -10,6 +10,7 @@ import { gitHubPR, gitHubToken } from "./github"
 import { error } from "./logger"
 import { mainMerge } from "./main-merge"
 import { originPush } from "./origin-push"
+import { parentBranch } from "./parent-branch"
 import { repoConfig } from "./repo-config"
 import { printCompletions, shellCompletion } from "./shell-completion"
 import { startBranch } from "./start-branch"
@@ -156,6 +157,14 @@ gitHubCommand
   .option("-e, --enable-auto-merge", "Keep checking the status till it changes")
   .action((options) => {
     wrap(createPR(options), options.debug)
+  })
+
+program
+  .command("parentbranch")
+  .description("Print out the current branch's parent")
+  .option("-y, --yes", "Push")
+  .action((options) => {
+    wrap(parentBranch(options), options.debug)
   })
 
 program.parse()
