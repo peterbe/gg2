@@ -22,6 +22,7 @@ export async function parentBranch(options: Options) {
     "HEAD",
   )
 
+  // Got this from https://github.com/steveukx/git-js/issues/955#issuecomment-1817787639
   const parents = outputFromGit
     .map((line) => line.replace(/\].*/, "")) // remove branch commit message
     .filter((line) => line.includes("*")) // only lines with a star in them
@@ -35,6 +36,13 @@ export async function parentBranch(options: Options) {
       `Parent branch for ${currentBranch} is: ${kleur.bold().green(parentBranch)}`,
     )
     console.log("")
+    console.log(
+      kleur.italic(
+        "To update the current branch, my merging in this parent branch, use: gg updatebranch",
+      ),
+    )
+    console.log("")
+
     const checkOut =
       yes ||
       (await confirm({
