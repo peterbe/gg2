@@ -9,7 +9,7 @@
 
 import type { Command } from "commander"
 
-// @ts-ignore - a trick to make a non TS file part of memory and build
+// @ts-expect-error - a trick to make a non TS file part of memory and build
 import code from "./completion.sh" with { type: "text" }
 
 export async function shellCompletion() {
