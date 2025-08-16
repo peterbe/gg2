@@ -13,7 +13,7 @@ type Options = {
 }
 export async function findBranches(search: string, options: Options) {
   const cleanup = Boolean(options.cleanup)
-  const number = Number.parseInt(options.number)
+  const number = Number.parseInt(options.number, 10)
   const reverse = Boolean(options.reverse)
   if (Number.isNaN(number)) {
     throw new Error("Not a number")
