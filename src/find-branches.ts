@@ -20,6 +20,8 @@ export async function findBranches(search: string, options: Options) {
   }
 
   const git = simpleGit()
+  const currentBranchSummary = await git.branch()
+  const currentBranch = currentBranchSummary.current
 
   const rawDates = await git.raw(
     "branch",
@@ -126,7 +128,12 @@ export async function findBranches(search: string, options: Options) {
     await printSearchResults(searchResults)
   }
 
-  if (countFound === 1) {
+  if (
+    !cleanup &&
+    countFound === 1 &&
+    searchResults[0] &&
+    searchResults[0].name !== currentBranch
+  ) {
     const found = searchResults[0]
     if (found) {
       const checkOut = await confirm({

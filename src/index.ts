@@ -112,8 +112,7 @@ program
   })
 
 program
-  .command("branch")
-  .alias("branches")
+  .command("branches")
   .description("Find and check out a branch by name")
   .argument("[search]", "Search input (can be fuzzy)")
   .option("-n, --number <number>", "Max number of branches to show", "20")
