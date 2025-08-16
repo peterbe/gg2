@@ -173,7 +173,6 @@ export async function commitBranch(options: Options) {
         message: `Create new PR:`,
         default: false,
       })
-      console.log({ createPr })
       if (createPr) {
         const storedTitle = await getTitle(currentBranch)
         const message = "Title:"
