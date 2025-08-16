@@ -165,6 +165,14 @@ export async function commitBranch(options: Options) {
       )
     }
     console.log("(⌘-click to open URLs)")
+
+    if (!pr) {
+      const createPr = await confirm({
+        message: `Create new PR:`,
+        default: false,
+      })
+      console.log({ createPr })
+    }
   }
 }
 
