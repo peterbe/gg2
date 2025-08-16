@@ -3,6 +3,7 @@ import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import {
+  createGitHubPR,
   findPRByBranchName,
   getGitHubNWO,
   getPRDetailsByNumber,
@@ -165,6 +166,29 @@ export async function commitBranch(options: Options) {
       )
     }
     console.log("(⌘-click to open URLs)")
+
+    if (!pr) {
+      console.log("")
+      const createPr = await confirm({
+        message: `Create new PR:`,
+        default: false,
+      })
+      if (createPr) {
+        const storedTitle = await getTitle(currentBranch)
+        const message = "Title:"
+        const title = await input({ message, default: storedTitle })
+
+        const data = await createGitHubPR({
+          head: currentBranch,
+          base: defaultBranch,
+          title,
+          body: "",
+          draft: false,
+        })
+        console.log("Pull request created:")
+        console.log(kleur.bold().green(data.html_url))
+      }
+    }
   }
 }
 

@@ -8,7 +8,7 @@ _generate_foo_completions() {
 
 _complete_foo_bash() {
   local IFS=$'\n'
-  local raw=($(_generate_foo_completions "$COMP_CWORD" "${COMP_WORDS[@]}"))
+  local raw=($(gg shell-completion --list "$COMP_LINE"))
   local trimmed=()
   trimmed+=( "${raw[@]}" )
 

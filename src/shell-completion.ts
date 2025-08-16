@@ -26,7 +26,8 @@ export async function printCompletions(options: Options) {
   // This search, if not undefined, will be a multi-line string always
   // starts with the word "gg". For example, if the user has typed
   // `gg [TAB]` what's sent here is that search === "gg\n".
-  const words = (options.search || "").split("\n")
+  const words = (options.search || "").split(/\s+/)
+
   words.shift()
 
   if (words.length === 1) {
@@ -43,7 +44,8 @@ export async function printCompletions(options: Options) {
     console.log(
       names
         .filter((name) => {
-          return (word && name.includes(word)) || true
+          if (word) return name.startsWith(word)
+          return true
         })
         .join("\n"),
     )
