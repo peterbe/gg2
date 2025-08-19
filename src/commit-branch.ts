@@ -1,3 +1,4 @@
+import { relative } from "node:path"
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
@@ -198,8 +199,9 @@ async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
 }
 
 async function getUnstagedFiles(git: SimpleGit): Promise<string[]> {
+  const relativeToRepo = (await git.revparse(["--show-prefix"])) || "."
   const status = await git.status()
-  return status.modified
+  return status.modified.map((file) => relative(relativeToRepo, file))
 }
 
 async function printUnTrackedFiles(files: string[]) {
