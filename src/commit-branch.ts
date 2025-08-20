@@ -170,6 +170,7 @@ export async function commitBranch(options: Options) {
 
     if (!pr) {
       console.log("")
+      console.log("YES?", { yes })
       const createPr = await confirm({
         message: `Create new PR:`,
         default: yes,
