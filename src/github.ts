@@ -7,6 +7,7 @@ import {
   findPRByBranchName,
   getOwnerRepo,
   getPRDetailsByNumber,
+  getRepoInfo,
   interpretMergeableStatus,
 } from "./github-utils"
 import { error, success, warn } from "./logger"
@@ -100,11 +101,22 @@ export async function gitHubPR(options: PROptions) {
   )
 
   const prDetails = await getPRDetailsByNumber(pr.number)
+  console.log(prDetails)
 
   console.log(kleur.bold(`PR Title: ${prDetails.title}`))
   const { message, canMerge } = interpretMergeableStatus(prDetails)
   if (canMerge) success(message)
   else warn(message)
+
+  if (canMerge) {
+    console.log({ auto_merge: prDetails.auto_merge })
+    if (prDetails.auto_merge) {
+      success("Can auto-merge!")
+    }
+    const repoInfo = await getRepoInfo()
+    console.log(repoInfo)
+    console.log({ allow_auto_merge: repoInfo.allow_auto_merge })
+  }
 
   if (watch) {
     let previousMessage = message
