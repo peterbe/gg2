@@ -109,8 +109,6 @@ export async function gitHubPR(options: PROptions) {
   if (prDetails.auto_merge) {
     success("Can auto-merge!")
   }
-  // if (canMerge) {
-  // }
 
   if (watch) {
     let previousMessage = message
