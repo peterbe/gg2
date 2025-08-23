@@ -109,7 +109,7 @@ export async function getOwnerRepo(): Promise<[string, string]> {
   return [owner, repo]
 }
 
-async function getOctokit() {
+export async function getOctokit() {
   const config = await getGlobalConfig()
   const token = config["github-token"]
   if (!token) {
