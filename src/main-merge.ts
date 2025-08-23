@@ -29,9 +29,9 @@ export async function mainMerge() {
   }
   const originName = origin.name
 
-  git.fetch(originName, defaultBranch)
+  await git.fetch(originName, defaultBranch)
 
-  git.mergeFromTo(originName, defaultBranch)
+  await git.mergeFromTo(originName, defaultBranch)
 
   success(
     `Latest ${originName}/${defaultBranch} branch merged into this branch.`,
