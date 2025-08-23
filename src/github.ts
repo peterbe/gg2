@@ -1,13 +1,13 @@
-import { input } from "@inquirer/prompts"
+import { confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import { Octokit } from "octokit"
 import simpleGit from "simple-git"
+import { checkAutoMergeAvailability, enableAutoMerge } from "./auto-merge"
 import { getDefaultBranch } from "./branch-utils"
 import {
   findPRByBranchName,
   getOwnerRepo,
   getPRDetailsByNumber,
-  getRepoInfo,
   interpretMergeableStatus,
 } from "./github-utils"
 import { error, success, warn } from "./logger"
@@ -101,7 +101,6 @@ export async function gitHubPR(options: PROptions) {
   )
 
   const prDetails = await getPRDetailsByNumber(pr.number)
-  console.log(prDetails)
 
   console.log(kleur.bold(`PR Title: ${prDetails.title}`))
   const { message, canMerge } = interpretMergeableStatus(prDetails)
@@ -109,13 +108,30 @@ export async function gitHubPR(options: PROptions) {
   else warn(message)
 
   if (canMerge) {
-    console.log({ auto_merge: prDetails.auto_merge })
+    // console.log({ auto_merge: prDetails.auto_merge })
     if (prDetails.auto_merge) {
       success("Can auto-merge!")
     }
-    const repoInfo = await getRepoInfo()
-    console.log(repoInfo)
-    console.log({ allow_auto_merge: repoInfo.allow_auto_merge })
+    // const repoInfo = await getRepoInfo()
+    // console.log(repoInfo)
+    // console.log({ allow_auto_merge: repoInfo.allow_auto_merge })
+  } else {
+    // console.log(await canEnableAutoMerge(prDetails.number))
+
+    const {
+      repository: { autoMergeAllowed },
+    } = await checkAutoMergeAvailability(prDetails.number)
+    if (autoMergeAllowed) {
+      console.log("Auto-merge allowed")
+      const tryEnableAutoMerge = await confirm({
+        message: `Enable auto-merge?`,
+        default: false,
+      })
+      if (tryEnableAutoMerge) {
+        const result = await enableAutoMerge(String(prDetails.id))
+        console.log("Result of attempting auto-merge:", result)
+      }
+    }
   }
 
   if (watch) {
