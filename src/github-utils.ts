@@ -134,16 +134,6 @@ export async function getPRDetailsByNumber(number: number) {
   return prDetails
 }
 
-export async function getRepoInfo() {
-  const octokit = await getOctokit()
-  const [owner, repo] = await getOwnerRepo()
-  const { data } = await octokit.rest.repos.get({
-    owner,
-    repo,
-  })
-  return data
-}
-
 type PRDetails = Awaited<ReturnType<typeof getPRDetailsByNumber>>
 export function interpretMergeableStatus(pr: PRDetails) {
   if (pr.state === "closed" && pr.merged) {
