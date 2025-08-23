@@ -97,34 +97,73 @@ interface EnableAutoMergeResponse {
   }
 }
 
-export async function enableAutoMerge(
-  pullRequestId: string,
-  mergeMethod: "MERGE" | "SQUASH" | "REBASE" = "MERGE",
-): Promise<AutoMergeRequest> {
-  const ENABLE_AUTO_MERGE_MUTATION = `
-    mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
-      enablePullRequestAutoMerge(input: {
-        pullRequestId: $pullRequestId
-        mergeMethod: $mergeMethod
-      }) {
-        pullRequest {
-          autoMergeRequest {
-            enabledAt
-            mergeMethod
-          }
+// export async function enableAutoMerge(
+//   pullRequestId: number,
+//   mergeMethod: "MERGE" | "SQUASH" | "REBASE" = "MERGE",
+// ): Promise<AutoMergeRequest> {
+//   const ENABLE_AUTO_MERGE_MUTATION = `
+//     mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+//       enablePullRequestAutoMerge(input: {
+//         pullRequestId: $pullRequestId
+//         mergeMethod: $mergeMethod
+//       }) {
+//         pullRequest {
+//           autoMergeRequest {
+//             enabledAt
+//             mergeMethod
+//           }
+//         }
+//       }
+//     }
+//   `
+//   const octokit = await getOctokit()
+
+//   const response = await octokit.graphql<EnableAutoMergeResponse>(
+//     ENABLE_AUTO_MERGE_MUTATION,
+//     {
+//       pullRequestId,
+//       mergeMethod,
+//     },
+//   )
+
+//   return response.enablePullRequestAutoMerge.pullRequest.autoMergeRequest
+// }
+
+export async function enableAutoMerge(prId: number) {
+  // const octokit = await getOctokit()
+
+  // // 1. Get the pull request ID
+  // const { repository } =  await octokit.graphql(`
+  //   query GetPullRequestId($owner: String!, $repo: String!, $prNumber: Int!) {
+  //     repository(owner: $owner, name: $repo) {
+  //       pullRequest(number: $prNumber) {
+  //         id
+  //       }
+  //     }
+  //   }
+  // `, {
+  //   owner,
+  //   repo,
+  //   prNumber,
+  // });
+
+  // const pullRequestId = repository.pullRequest.id;
+
+  const octokit = await getOctokit()
+  // 2. Enable auto-merge
+  const response = await octokit.graphql(
+    `
+      mutation EnableAutoMerge($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod) {
+        enablePullRequestAutoMerge(input: {pullRequestId: $pullRequestId, mergeMethod: $mergeMethod}) {
+          clientMutationId
         }
       }
-    }
-  `
-  const octokit = await getOctokit()
-
-  const response = await octokit.graphql<EnableAutoMergeResponse>(
-    ENABLE_AUTO_MERGE_MUTATION,
+    `,
     {
-      pullRequestId,
-      mergeMethod,
+      pullRequestId: prId,
+      mergeMethod: "MERGE", // or "SQUASH", "REBASE"
     },
   )
 
-  return response.enablePullRequestAutoMerge.pullRequest.autoMergeRequest
+  console.log(response)
 }
