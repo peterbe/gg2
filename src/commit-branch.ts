@@ -86,24 +86,7 @@ export async function commitBranch(options: Options) {
   await git.add(unstagedFiles)
 
   try {
-    if (noVerify) {
-      await git.commit(title, ["--no-verify"])
-    } else {
-      // If the pre-commit hook prints errors, with colors,
-      // using this Bun.spawn is the only way I know to preserve those outputs
-      // in color.
-      // This also means, that when all goes well, it will print too.
-      const proc = Bun.spawn(["git", "commit", "-m", title])
-      const exited = await proc.exited
-      if (exited) {
-        console.log("\n")
-        warn("Warning! The git commit failed.")
-        warn(
-          "Hopefully the printed error message above is clear enough. You'll have to try to commit again.",
-        )
-        process.exit(exited)
-      }
-    }
+    await commit(git, title, noVerify)
   } catch (error) {
     console.warn("An error happened when trying to commmit!")
     if (
@@ -189,6 +172,48 @@ export async function commitBranch(options: Options) {
         console.log("Pull request created:")
         console.log(kleur.bold().green(data.html_url))
       }
+    }
+  }
+}
+
+async function commit(
+  git: SimpleGit,
+  title: string,
+  noVerify: boolean,
+): Promise<void> {
+  if (noVerify) {
+    await git.commit(title, ["--no-verify"])
+  } else {
+    // If the pre-commit hook prints errors, with colors,
+    // using this Bun.spawn is the only way I know to preserve those outputs
+    // in color.
+    // This also means, that when all goes well, it will print too.
+    const proc = Bun.spawn(["git", "commit", "-m", title])
+
+    const exited = await proc.exited
+
+    if (exited) {
+      if (!noVerify) {
+        console.log("\n")
+        warn("Commit failed and you did not use --no-verify.")
+        const retry = await confirm({
+          message: "Try again but with --no-verify?",
+          default: false,
+        })
+        if (retry) {
+          warn(`Retrying commit ${kleur.italic("with")} --no-verify...`)
+          await commit(git, title, true)
+          success("Commit succeeded with --no-verify")
+          return
+        }
+      }
+
+      console.log("\n")
+      warn("Warning! The git commit failed.")
+      warn(
+        "Hopefully the printed error message above is clear enough. You'll have to try to commit again.",
+      )
+      process.exit(exited)
     }
   }
 }
