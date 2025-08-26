@@ -55,6 +55,7 @@ program
   .option("--debug", "Debug mode (shows traceback)")
   .option("--no-verify", "No git hook verify")
   .option("-y, --yes", "Push")
+  // Useful if you want to type `gg commit This is my commit message`
   .argument("[message...]", "Commit message")
   .action((message, options) => {
     wrap(commitBranch(message?.join(" ") || "", options), options.debug)
