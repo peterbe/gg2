@@ -146,14 +146,14 @@ export function interpretMergeableStatus(pr: PRDetails) {
   if (pr.state === "closed" && !pr.merged) {
     return {
       canMerge: false,
-      message: "PR is closed without merging",
+      message: "PR is CLOSED without merging",
     }
   }
 
   if (pr.draft) {
     return {
       canMerge: false,
-      message: "PR is in draft state",
+      message: "PR is in DRAFT state",
     }
   }
 
