@@ -19,7 +19,7 @@ type Options = {
   yes?: boolean
 }
 
-export async function commitBranch(options: Options) {
+export async function commitBranch(message: string, options: Options) {
   const yes = Boolean(options.yes)
   const noVerify = !options.verify
   const git = simpleGit()
@@ -65,9 +65,8 @@ export async function commitBranch(options: Options) {
     }
   }
 
-  const storedTitle = await getTitle(currentBranch)
-  const message = "Title:"
-  let title = await input({ message, default: storedTitle })
+  const storedTitle = message || (await getTitle(currentBranch))
+  let title = await input({ message: "Title:", default: storedTitle })
   if (!title && storedTitle) {
     title = storedTitle
   }

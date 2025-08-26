@@ -55,10 +55,9 @@ program
   .option("--debug", "Debug mode (shows traceback)")
   .option("--no-verify", "No git hook verify")
   .option("-y, --yes", "Push")
-  .argument("[message]", "Commit message")
+  .argument("[message...]", "Commit message")
   .action((message, options) => {
-    console.log({ message })
-    wrap(commitBranch(options), options.debug)
+    wrap(commitBranch(message?.join(" ") || "", options), options.debug)
   })
 
 program
