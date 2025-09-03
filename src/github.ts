@@ -1,8 +1,9 @@
 import { confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import { Octokit } from "octokit"
-import simpleGit from "simple-git"
+import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
+import { deleteLocalBranch } from "./get-back"
 import {
   findPRByBranchName,
   getOwnerRepo,
@@ -94,7 +95,7 @@ export async function gitHubPR(options: PROptions) {
   }
 
   success(
-    `Number #${pr.number} ${pr.html_url} ${
+    `Number #${pr.number} ${kleur.bold(pr.html_url)} ${
       pr.draft ? "DRAFT" : pr.state.toUpperCase()
     }`,
   )
@@ -107,42 +108,9 @@ export async function gitHubPR(options: PROptions) {
   else warn(message)
 
   if (prDetails.mergeable_state === "behind") {
-    warn("PR appears to be be behind the base branch")
-    const attemptMastermerge = await confirm({
-      message: `Attempt to merge upstream ${kleur.italic(defaultBranch)} into ${kleur.italic(currentBranch)} now?`,
-      default: false,
-    })
-    if (attemptMastermerge) {
-      const upstreamName = await getUpstreamName()
-
-      const remotes = await git.getRemotes(true) // true includes URLs
-      const origin = remotes.find((remote) => remote.name === upstreamName)
-      //   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
-      if (!origin?.name) {
-        throw new Error(`Could not find a remote called '${upstreamName}'`)
-      }
-      const originName = origin.name
-      await git.fetch(originName, defaultBranch)
-
-      await git.mergeFromTo(originName, defaultBranch)
-
-      success(
-        `Latest ${originName}/${defaultBranch} branch merged into this branch.`,
-      )
-
-      let pushToRemote = false
-      if (!pushToRemote && origin) {
-        pushToRemote = await confirm({
-          message: `Push to ${originName}:`,
-          default: true,
-        })
-      }
-
-      if (pushToRemote) {
-        await git.push(upstreamName, currentBranch)
-        success(`Changes pushed to ${originName}/${currentBranch}`)
-      }
-    }
+    await isBehind({ git, defaultBranch, currentBranch })
+  } else if (prDetails.state === "closed" && prDetails.merged) {
+    await getBack({ git, defaultBranch, currentBranch })
   }
 
   if (prDetails.auto_merge) {
@@ -184,4 +152,84 @@ export async function gitHubPR(options: PROptions) {
 
 async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function isBehind({
+  git,
+  defaultBranch,
+  currentBranch,
+}: {
+  git: SimpleGit
+  defaultBranch: string
+  currentBranch: string
+}) {
+  warn("PR appears to be be behind the base branch")
+  const attemptMastermerge = await confirm({
+    message: `Attempt to merge upstream ${kleur.italic(defaultBranch)} into ${kleur.italic(currentBranch)} now?`,
+    default: false,
+  })
+  if (attemptMastermerge) {
+    const upstreamName = await getUpstreamName()
+
+    const remotes = await git.getRemotes(true) // true includes URLs
+    const origin = remotes.find((remote) => remote.name === upstreamName)
+    if (!origin?.name) {
+      throw new Error(`Could not find a remote called '${upstreamName}'`)
+    }
+    const originName = origin.name
+    await git.fetch(originName, defaultBranch)
+
+    await git.mergeFromTo(originName, defaultBranch)
+
+    success(
+      `Latest ${originName}/${defaultBranch} branch merged into this branch.`,
+    )
+
+    let pushToRemote = false
+    if (!pushToRemote && origin) {
+      pushToRemote = await confirm({
+        message: `Push to ${originName}:`,
+        default: true,
+      })
+    }
+
+    if (pushToRemote) {
+      await git.push(upstreamName, currentBranch)
+      success(`Changes pushed to ${originName}/${currentBranch}`)
+    }
+  }
+}
+
+async function getBack({
+  git,
+  defaultBranch,
+  currentBranch,
+}: {
+  git: SimpleGit
+  defaultBranch: string
+  currentBranch: string
+}) {
+  const status = await git.status()
+  if (!status.isClean()) {
+    return
+  }
+
+  success("PR has been merged!")
+  const goBack = await confirm({
+    message: `Go back to branch ${kleur.italic(defaultBranch)} and clean this branch up?`,
+    default: true,
+  })
+  if (goBack) {
+    await git.checkout(defaultBranch)
+
+    const upstreamName = await getUpstreamName()
+
+    const remotes = await git.getRemotes(true)
+    const origin = remotes.find((remote) => remote.name === upstreamName)
+    if (origin) {
+      await git.pull(origin.name, defaultBranch)
+      warn(`Going to delete branch ${kleur.italic(currentBranch)}`)
+      await deleteLocalBranch({ git, currentBranch, defaultBranch, yes: false })
+    }
+  }
 }
