@@ -136,8 +136,9 @@ export async function commitBranch(message: string, options: Options) {
         prDetails = await getPRDetailsByNumber(pr.number)
       }
 
-      const { message, canMerge } = interpretMergeableStatus(prDetails)
-      if (canMerge) success(message)
+      const { message, canMerge, hasWarning } =
+        interpretMergeableStatus(prDetails)
+      if (canMerge && !hasWarning) success(message)
       else warn(message)
     } else {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright

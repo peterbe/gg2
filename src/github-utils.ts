@@ -180,18 +180,21 @@ export function interpretMergeableStatus(pr: PRDetails) {
       return {
         canMerge: true,
         message: "PR can be merged but base branch has newer commits",
+        hasWarning: true,
       }
 
     case "unstable":
       return {
         canMerge: true,
         message: "PR can be merged but some status checks failed",
+        hasWarning: true,
       }
 
     case "has_hooks":
       return {
         canMerge: true,
         message: "PR can be merged but has pre-receive hooks",
+        hasWarning: true,
       }
 
     case "unknown":
