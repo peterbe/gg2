@@ -111,9 +111,7 @@ export async function gitHubPR(options: PROptions) {
     await isBehind({ git, defaultBranch, currentBranch })
   } else if (prDetails.state === "closed" && prDetails.merged) {
     await getBack({ git, defaultBranch, currentBranch })
-  }
-
-  if (prDetails.auto_merge) {
+  } else if (prDetails.auto_merge) {
     success("Can auto-merge!")
   }
 

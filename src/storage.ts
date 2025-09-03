@@ -15,10 +15,6 @@ export async function storeTitle(
   await db.write(JSON.stringify(data, null, 2))
 }
 
-// type ReposStorage = {
-//   [key: string]: string
-// }
-
 type ConfigKeys =
   | "branch-prefix"
   | "title-prefix"
