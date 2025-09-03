@@ -1,4 +1,4 @@
-import { input } from "@inquirer/prompts"
+import { confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import { Octokit } from "octokit"
 import simpleGit from "simple-git"
@@ -10,7 +10,7 @@ import {
   interpretMergeableStatus,
 } from "./github-utils"
 import { error, success, warn } from "./logger"
-import { getGlobalConfig, storeGlobalConfig } from "./storage"
+import { getGlobalConfig, getUpstreamName, storeGlobalConfig } from "./storage"
 
 type TokenOptions = {
   test?: boolean
@@ -102,9 +102,48 @@ export async function gitHubPR(options: PROptions) {
   const prDetails = await getPRDetailsByNumber(pr.number)
 
   console.log(kleur.bold(`PR Title: ${prDetails.title}`))
-  const { message, canMerge } = interpretMergeableStatus(prDetails)
-  if (canMerge) success(message)
+  const { message, canMerge, hasWarning } = interpretMergeableStatus(prDetails)
+  if (canMerge && !hasWarning) success(message)
   else warn(message)
+
+  if (prDetails.mergeable_state === "behind") {
+    warn("PR appears to be be behind the base branch")
+    const attemptMastermerge = await confirm({
+      message: `Attempt to merge upstream ${kleur.italic(defaultBranch)} into ${kleur.italic(currentBranch)} now?`,
+      default: false,
+    })
+    if (attemptMastermerge) {
+      const upstreamName = await getUpstreamName()
+
+      const remotes = await git.getRemotes(true) // true includes URLs
+      const origin = remotes.find((remote) => remote.name === upstreamName)
+      //   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
+      if (!origin?.name) {
+        throw new Error(`Could not find a remote called '${upstreamName}'`)
+      }
+      const originName = origin.name
+      await git.fetch(originName, defaultBranch)
+
+      await git.mergeFromTo(originName, defaultBranch)
+
+      success(
+        `Latest ${originName}/${defaultBranch} branch merged into this branch.`,
+      )
+
+      let pushToRemote = false
+      if (!pushToRemote && origin) {
+        pushToRemote = await confirm({
+          message: `Push to ${originName}:`,
+          default: true,
+        })
+      }
+
+      if (pushToRemote) {
+        await git.push(upstreamName, currentBranch)
+        success(`Changes pushed to ${originName}/${currentBranch}`)
+      }
+    }
+  }
 
   if (prDetails.auto_merge) {
     success("Can auto-merge!")
@@ -121,10 +160,11 @@ export async function gitHubPR(options: PROptions) {
       )
       await sleep(SLEEP_TIME_SECONDS * 1000)
       const prDetails = await getPRDetailsByNumber(pr.number)
-      const { message, canMerge } = interpretMergeableStatus(prDetails)
+      const { message, canMerge, hasWarning } =
+        interpretMergeableStatus(prDetails)
       console.clear()
       console.log(kleur.bold(`PR Title: ${prDetails.title}`))
-      if (canMerge) success(message)
+      if (canMerge && !hasWarning) success(message)
       else warn(message)
 
       if (message !== previousMessage || canMerge !== previousCanMerge) {
