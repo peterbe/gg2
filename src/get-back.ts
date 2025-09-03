@@ -1,5 +1,5 @@
 import { confirm } from "@inquirer/prompts"
-import simpleGit from "simple-git"
+import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { success, warn } from "./logger"
 import { getUpstreamName } from "./storage"
@@ -31,10 +31,24 @@ export async function getBack(options: Options) {
   const origin = remotes.find((remote) => remote.name === upstreamName)
   if (origin) {
     await git.pull(origin.name, defaultBranch)
+  } else {
+    await git.pull()
   }
 
-  await git.pull()
+  await deleteLocalBranch({ git, currentBranch, defaultBranch, yes })
+}
 
+export async function deleteLocalBranch({
+  git,
+  defaultBranch,
+  currentBranch,
+  yes,
+}: {
+  git: SimpleGit
+  defaultBranch: string
+  currentBranch: string
+  yes: boolean
+}) {
   try {
     await git.deleteLocalBranch(currentBranch)
   } catch (error) {
