@@ -22,7 +22,7 @@ export async function gitHubToken(token: string, options: TokenOptions) {
   const config = await getGlobalConfig()
 
   if (!token && config["github-token"] && (options.test || options.testPrs)) {
-    await testToken(config["github-token"], options)
+    await testToken(config["github-token"] as string, options)
     return
   }
 

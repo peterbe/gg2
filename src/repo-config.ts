@@ -9,6 +9,9 @@ export async function repoConfig() {
   const padding = Math.max(30, longestKey) + 1
   console.log(kleur.bold("KEY".padEnd(padding, " ")), kleur.italic("VALUE")) //, italic(value));
   for (const [key, value] of Object.entries(config)) {
-    console.log(kleur.bold(`${key}:`.padEnd(padding, " ")), kleur.italic(value))
+    console.log(
+      kleur.bold(`${key}:`.padEnd(padding, " ")),
+      kleur.italic(JSON.stringify(value)),
+    )
   }
 }

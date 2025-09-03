@@ -15,7 +15,7 @@ export async function startBranch(
   const config = await getRepoConfig()
   if (
     config["branch-prefix"] &&
-    !branchName.startsWith(config["branch-prefix"])
+    !branchName.startsWith(config["branch-prefix"] as string)
   ) {
     branchName = `${config["branch-prefix"]}${branchName}`
   }
@@ -41,7 +41,7 @@ async function getTitle(urlOrTitle: string[] | undefined): Promise<string> {
   const titlePrefix = config["title-prefix"]
   const title = await input({
     message: "Title:",
-    default: titlePrefix ? titlePrefix : undefined,
+    default: titlePrefix ? (titlePrefix as string) : undefined,
     prefill: "editable",
   })
   return title
