@@ -19,12 +19,16 @@ export async function storeTitle(
 //   [key: string]: string
 // }
 
-type ConfigKeys = "branch-prefix" | "title-prefix" | "upstream-name" // more to come!
+type ConfigKeys =
+  | "branch-prefix"
+  | "title-prefix"
+  | "upstream-name"
+  | "offer-auto-merge" // more to come!
 
 type GlobalConfigKeys = "github-token" // more to come
 
 type BranchTitles = Record<string, string>
-type ConfigValues = Record<string, string>
+type ConfigValues = Record<string, string | boolean>
 
 type RepoData = {
   BRANCH_TITLES: BranchTitles
@@ -76,7 +80,7 @@ function expandPath(path: string): string {
     .join(sep)
 }
 
-export async function storeConfig(key: ConfigKeys, value: string) {
+export async function storeConfig(key: ConfigKeys, value: string | boolean) {
   const [data, repoData] = await getRepoData()
   repoData.CONFIG[key] = value
   await db.write(JSON.stringify(data, null, 2))
@@ -121,5 +125,5 @@ export async function getUpstreamName(): Promise<string> {
     upstreamName = "origin"
   }
 
-  return upstreamName
+  return upstreamName as string
 }

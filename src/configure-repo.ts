@@ -1,7 +1,7 @@
 import { userInfo } from "node:os"
 import { basename } from "node:path"
 
-import { input, select } from "@inquirer/prompts"
+import { confirm, input, select } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit from "simple-git"
 import { warn } from "./logger"
@@ -26,6 +26,10 @@ export async function configureRepo() {
       {
         name: "Upstream name",
         value: "upstream-name",
+      },
+      {
+        name: "Auto-merge PRs",
+        value: "auto-merge",
       },
 
       //   {
@@ -52,6 +56,8 @@ export async function configureRepo() {
     await configureTitlePrefix()
   } else if (answer === "upstream-name") {
     await configureUpstreamName()
+  } else if (answer === "auto-merge") {
+    await configureAutoMerge()
   } else {
     warn("No selected thing to configure. Bye")
   }
@@ -59,7 +65,8 @@ export async function configureRepo() {
 
 async function configureBranchPrefix() {
   const config = await getRepoConfig()
-  const defaultPrefix = config["branch-prefix"] || `${userInfo().username}/`
+  const defaultPrefix =
+    (config["branch-prefix"] as string) || `${userInfo().username}/`
   const value = await input({
     message: `Prefix:`,
     default: defaultPrefix,
@@ -67,7 +74,7 @@ async function configureBranchPrefix() {
   })
   await storeConfig("branch-prefix", value)
   console.log(
-    `Old value: ${config["branch-prefix"] ? kleur.yellow(config["branch-prefix"]) : kleur.italic("nothing set")}`,
+    `Old value: ${config["branch-prefix"] ? kleur.yellow(config["branch-prefix"] as string) : kleur.italic("nothing set")}`,
   )
   console.log(
     `New value: ${value ? kleur.green(value) : kleur.italic("empty")}`,
@@ -76,7 +83,8 @@ async function configureBranchPrefix() {
 
 async function configureTitlePrefix() {
   const config = await getRepoConfig()
-  const defaultPrefix = config["title-prefix"] || `${userInfo().username}/`
+  const defaultPrefix =
+    (config["title-prefix"] as string) || `${userInfo().username}/`
   const value = await input({
     message: `Prefix:`,
     default: defaultPrefix,
@@ -84,7 +92,7 @@ async function configureTitlePrefix() {
   })
   await storeConfig("title-prefix", value)
   console.log(
-    `Old value: ${config["title-prefix"] ? kleur.yellow(config["title-prefix"]) : kleur.italic("nothing set")}`,
+    `Old value: ${config["title-prefix"] ? kleur.yellow(config["title-prefix"] as string) : kleur.italic("nothing set")}`,
   )
   console.log(
     `New value: ${value ? kleur.green(value) : kleur.italic("empty")}`,
@@ -94,7 +102,7 @@ async function configureTitlePrefix() {
 async function configureUpstreamName() {
   const KEY = "upstream-name"
   const config = await getRepoConfig()
-  const defaultName = config[KEY] || "origin"
+  const defaultName = (config[KEY] as string) || "origin"
   const value = await input({
     message: `Name:`,
     default: defaultName,
@@ -102,9 +110,27 @@ async function configureUpstreamName() {
   })
   await storeConfig(KEY, value)
   console.log(
-    `Old value: ${config[KEY] ? kleur.yellow(config[KEY]) : kleur.italic("nothing set")}`,
+    `Old value: ${config[KEY] ? kleur.yellow(config[KEY] as string) : kleur.italic("nothing set")}`,
   )
   console.log(
     `New value: ${value ? kleur.green(value) : kleur.italic("empty")}`,
   )
+}
+
+async function configureAutoMerge() {
+  const KEY = "offer-auto-merge"
+  const config = await getRepoConfig()
+  const value = await confirm({
+    message: `Suggest Auto-merge on PRs:`,
+    default: config[KEY] === undefined ? true : Boolean(config[KEY]),
+  })
+  await storeConfig(KEY, value)
+  if (value !== config[KEY]) {
+    console.log(
+      `Old value: ${config[KEY] === undefined ? kleur.italic("not set") : kleur.bold(JSON.stringify(config[KEY]))}`,
+    )
+    console.log(
+      `New value: ${value ? kleur.green("true") : kleur.red("false")}`,
+    )
+  }
 }
