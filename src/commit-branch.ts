@@ -19,7 +19,7 @@ type Options = {
   yes?: boolean
 }
 
-export async function commitBranch(_message: string, options: Options) {
+export async function commitBranch(message: string, options: Options) {
   const yes = Boolean(options.yes)
   const noVerify = !options.verify
   const git = simpleGit()
@@ -65,13 +65,19 @@ export async function commitBranch(_message: string, options: Options) {
     }
   }
 
-  const storedTitle = await getTitle(currentBranch)
-  let title = await input({ message: "Title:", default: storedTitle })
-  if (!title && storedTitle) {
-    title = storedTitle
-  }
+  let title = message
   if (!title) {
-    throw new Error("No title provided. Please provide a title for the commit.")
+    const storedTitle = await getTitle(currentBranch)
+    console.log({ message })
+    title = await input({ message: "Title:", default: storedTitle })
+    if (!title && storedTitle) {
+      title = storedTitle
+    }
+    if (!title) {
+      throw new Error(
+        "No title provided. Please provide a title for the commit.",
+      )
+    }
   }
 
   const upstreamName = await getUpstreamName()
