@@ -65,13 +65,20 @@ export async function commitBranch(message: string, options: Options) {
     }
   }
 
-  const storedTitle = message || (await getTitle(currentBranch))
-  let title = await input({ message: "Title:", default: storedTitle })
-  if (!title && storedTitle) {
-    title = storedTitle
-  }
+  // If there was an explicit (commit) message passed at the invocation,
+  // don't bother asking.
+  let title = message
   if (!title) {
-    throw new Error("No title provided. Please provide a title for the commit.")
+    const storedTitle = await getTitle(currentBranch)
+    title = await input({ message: "Title:", default: storedTitle })
+    if (!title && storedTitle) {
+      title = storedTitle
+    }
+    if (!title) {
+      throw new Error(
+        "No title provided. Please provide a title for the commit.",
+      )
+    }
   }
 
   const upstreamName = await getUpstreamName()
