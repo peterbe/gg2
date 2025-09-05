@@ -65,10 +65,11 @@ export async function commitBranch(message: string, options: Options) {
     }
   }
 
+  // If there was an explicit (commit) message passed at the invocation,
+  // don't bother asking.
   let title = message
   if (!title) {
     const storedTitle = await getTitle(currentBranch)
-    console.log({ message })
     title = await input({ message: "Title:", default: storedTitle })
     if (!title && storedTitle) {
       title = storedTitle
