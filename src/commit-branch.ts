@@ -226,8 +226,11 @@ async function commit(
 }
 
 async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
+  const relativeToRepo = (await git.revparse(["--show-prefix"])) || "."
   const status = await git.status()
-  return status.not_added.filter((file) => !file.endsWith("~"))
+  return status.not_added
+    .filter((file) => !file.endsWith("~"))
+    .map((file) => relative(relativeToRepo, file))
 }
 
 async function getUnstagedFiles(git: SimpleGit): Promise<string[]> {
