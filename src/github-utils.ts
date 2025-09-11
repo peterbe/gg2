@@ -246,7 +246,6 @@ export async function enableAutoMergeGraphQL(
     `
 
   const octokit = await getOctokit()
-  // const [owner, repo] = await getOwnerRepo()
 
   const result = await octokit.graphql(mutation, {
     pullRequestId,
