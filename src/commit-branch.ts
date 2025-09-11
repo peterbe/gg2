@@ -188,7 +188,7 @@ export async function commitBranch(message: string, options: Options) {
             default: yes,
           })
           if (enableAutoMerge) {
-            await enableAutoMergeGraphQL(String(data.number), autoMergeMethod)
+            await enableAutoMergeGraphQL(data.node_id, autoMergeMethod)
           }
         }
       }
