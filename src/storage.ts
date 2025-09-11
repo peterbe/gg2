@@ -19,7 +19,9 @@ type ConfigKeys =
   | "branch-prefix"
   | "title-prefix"
   | "upstream-name"
-  | "offer-auto-merge" // more to come!
+  | "offer-auto-merge"
+  | "auto-merge-method"
+// more to come!
 
 type GlobalConfigKeys = "github-token" // more to come
 
@@ -122,4 +124,13 @@ export async function getUpstreamName(): Promise<string> {
   }
 
   return upstreamName as string
+}
+
+type MergeMethod = "SQUASH" | "REBASE" | "MERGE"
+export async function getAutoMergeMethod(): Promise<MergeMethod | undefined> {
+  const config = await getRepoConfig()
+  if (config["auto-merge-method"]) {
+    return config["auto-merge-method"] as MergeMethod
+  }
+  return undefined
 }

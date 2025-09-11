@@ -222,3 +222,36 @@ export function interpretMergeableStatus(pr: PRDetails) {
       }
   }
 }
+
+export async function enableAutoMergeGraphQL(
+  pullRequestId: string,
+  mergeMethod: "MERGE" | "SQUASH" | "REBASE" = "MERGE",
+) {
+  const mutation = `
+      mutation EnableAutoMerge($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+        enablePullRequestAutoMerge(input: {
+          pullRequestId: $pullRequestId,
+          mergeMethod: $mergeMethod
+        }) {
+          pullRequest {
+            id
+            number
+            autoMergeRequest {
+              enabledAt
+              mergeMethod
+            }
+          }
+        }
+      }
+    `
+
+  const octokit = await getOctokit()
+
+  const result = await octokit.graphql(mutation, {
+    pullRequestId,
+    mergeMethod,
+  })
+
+  console.log("Auto-merge enabled successfully:", result)
+  return result
+}
