@@ -5,6 +5,7 @@ import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import {
   createGitHubPR,
+  enableAutoMergeGraphQL,
   findPRByBranchName,
   getGitHubNWO,
   getPRDetailsByNumber,
@@ -12,7 +13,7 @@ import {
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { success, warn } from "./logger"
-import { getTitle, getUpstreamName } from "./storage"
+import { getAutoMergeMethod, getTitle, getUpstreamName } from "./storage"
 
 type Options = {
   verify?: boolean
@@ -178,6 +179,18 @@ export async function commitBranch(message: string, options: Options) {
         })
         console.log("Pull request created:")
         console.log(kleur.bold().green(data.html_url))
+
+        const autoMergeMethod = await getAutoMergeMethod()
+        if (autoMergeMethod) {
+          const autoMergeMethodVerbose = `${autoMergeMethod.charAt(0).toUpperCase()}${autoMergeMethod.slice(1).toLowerCase()}`
+          const enableAutoMerge = await confirm({
+            message: `Enable auto-merge (using ${autoMergeMethodVerbose}):`,
+            default: yes,
+          })
+          if (enableAutoMerge) {
+            await enableAutoMergeGraphQL(String(data.number), autoMergeMethod)
+          }
+        }
       }
     }
   }
