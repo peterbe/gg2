@@ -227,31 +227,63 @@ export async function enableAutoMergeGraphQL(
   pullRequestId: string,
   mergeMethod: "MERGE" | "SQUASH" | "REBASE" = "MERGE",
 ) {
-  const mutation = `
-      mutation EnableAutoMerge($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
-        enablePullRequestAutoMerge(input: {
-          pullRequestId: $pullRequestId,
-          mergeMethod: $mergeMethod
-        }) {
-          pullRequest {
-            id
-            number
-            autoMergeRequest {
-              enabledAt
-              mergeMethod
-            }
+  const octokit = await getOctokit()
+
+  try {
+    {
+      const testQuery = `
+    query GetPullRequestNumber($id: ID!) {
+      node(id: $id) {
+        ... on PullRequest {
+          number
+          title
+          state
+        }
+      }
+    }
+  `
+
+      const result0 = await octokit.graphql(testQuery, {
+        id: pullRequestId,
+      })
+      console.log("Test query result:", result0)
+    }
+
+    const mutation = `
+    mutation EnableAutoMerge($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+      enablePullRequestAutoMerge(input: {
+        pullRequestId: $pullRequestId,
+        mergeMethod: $mergeMethod
+      }) {
+        pullRequest {
+          id
+          number
+          autoMergeRequest {
+            enabledAt
+            mergeMethod
           }
         }
       }
-    `
+    }
+  `
 
-  const octokit = await getOctokit()
+    const result = await octokit.graphql(mutation, {
+      pullRequestId,
+      mergeMethod,
+    })
 
-  const result = await octokit.graphql(mutation, {
-    pullRequestId,
-    mergeMethod,
-  })
-
-  console.log("Auto-merge enabled successfully:", result)
-  return result
+    console.log("Auto-merge enabled successfully:", result)
+    return result
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error)
+      if ("error" in error) {
+        console.error("GraphQL error details:", error.error)
+      }
+      if ("response" in error) {
+        console.error("GraphQL response details:", error.response)
+      }
+    }
+    throw error
+  }
 }
