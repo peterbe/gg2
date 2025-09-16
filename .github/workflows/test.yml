@@ -28,7 +28,8 @@ jobs:
           pwd
           whoami
           echo $PATH
-          cp out/gg-linux-x64 /home/runner/.local/bin/gg
+          mv out/gg-linux-x64 /home/runner/.local/bin/
+          ls -l /home/runner/.local/bin/
           gg --version
       - run: bun test
 
