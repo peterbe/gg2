@@ -31,6 +31,10 @@ describe("basics", async () => {
 
   test("create branch and commit", async () => {
     await $`git init --initial-branch=main`.cwd(tempDir)
+    await $`echo "# My Project" > README.md`.cwd(tempDir)
+    await $`git add README.md`.cwd(tempDir)
+    await $`git commit -m "Initial commit"`.cwd(tempDir)
+
     await $`echo "This is my new branch" | gg start`.cwd(tempDir)
     const branchName = await $`git branch --show-current`.cwd(tempDir).text()
     expect(branchName.trim()).toBe("this-is-my-new-branch")
