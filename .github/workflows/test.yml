@@ -20,12 +20,15 @@ jobs:
       - run: bun run tsc
       - run: bun run build
       - run: bun run build:linux-x64
-      - run: |
+      - name: Compile and install
+        run: |
           set -ex
           ls -l out/gg-linux-x64
           ./out/gg-linux-x64 --version
-          echo $PATH
-          pwd
-          whoami
+          mv out/gg-linux-x64 ~/.local/bin/gg
+          gg --version
+          # echo $PATH
+          # pwd
+          # whoami
       - run: bun test
 
