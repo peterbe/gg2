@@ -27,6 +27,9 @@ jobs:
           # echo "/home/runner/.local/bin" >> $GITHUB_PATH
           echo "out" >> $GITHUB_PATH
 
+          ls -l /home/runner/.local/bin/
+          touch /home/runner/.local/bin/example.txt
+
           ls -l out/gg-linux-x64
           ./out/gg-linux-x64 --version
           mv out/gg-linux-x64 out/gg
@@ -36,7 +39,6 @@ jobs:
           pwd
           whoami
           echo $PATH
-          ls -l /home/runner/.local/bin/
           mv out/gg-linux-x64 /home/runner/.local/bin/
           gg --version
       - run: bun test
