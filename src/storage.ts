@@ -4,7 +4,9 @@ import { sep } from "node:path"
 import simpleGit from "simple-git"
 import { warn } from "./logger"
 
-const db = Bun.file(expandPath("~/.gg.json"))
+const configFilePath = process.env.GG_CONFIG_FILE || "~/.gg.json"
+
+const db = Bun.file(expandPath(configFilePath))
 
 export async function storeTitle(
   branchName: string,
