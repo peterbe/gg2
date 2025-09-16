@@ -33,7 +33,7 @@ jobs:
 
           ls -l out/gg-linux-x64
           ./out/gg-linux-x64 --version
-          mv out/gg-linux-x64 /home/runner/.local/bin/
+          mv out/gg-linux-x64 /home/runner/.local/bin/gg
 
           # mv out/gg-linux-x64 out/gg
           # ./out/gg --version
