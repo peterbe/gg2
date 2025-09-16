@@ -20,5 +20,10 @@ jobs:
       - run: bun run tsc
       - run: bun run build
       - run: bun run build:linux-arm64
+      - run: |
+          set -ex
+          ls -l out/gg-linux-arm64
+          ./out/gg-linux-arm64 --version
+          echo $PATH
       - run: bun test
 
