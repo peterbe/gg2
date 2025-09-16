@@ -19,6 +19,19 @@ jobs:
       - run: bun run lint:check
       - run: bun run tsc
       - run: bun run build
-      - run: bun run build:linux-arm64
+      - run: bun run build:linux-x64
+      - name: Compile and install
+        run: |
+          set -e
+          mkdir -p /home/runner/.local/bin
+          mv out/gg-linux-x64 /home/runner/.local/bin/gg
+      - name: Add local bin to PATH
+        run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
+      - name: Test installed version
+        run: |
+          set -e
+          which gg
+          gg --version
+          gg help
       - run: bun test
 
