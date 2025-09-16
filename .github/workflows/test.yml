@@ -25,10 +25,10 @@ jobs:
           set -ex
           ls -l out/gg-linux-x64
           ./out/gg-linux-x64 --version
-          mv out/gg-linux-x64 ~/.local/bin/gg
+          pwd
+          whoami
+          echo $PATH
+          mv out/gg-linux-x64 /home/runner/.local/bin/gg
           gg --version
-          # echo $PATH
-          # pwd
-          # whoami
       - run: bun test
 
