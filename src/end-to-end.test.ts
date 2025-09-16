@@ -13,8 +13,12 @@ describe("basics", async () => {
     await rm(tempDir, { recursive: true })
   })
 
-  test("help", async () => {
-    const output = await $`gg --version`.cwd(tempDir).text()
+  test("version", async () => {
+    const output = await $`gg --version`.text()
     expect(/\d+\.\d+\d+/.test(output)).toBe(true)
+  })
+  test("help", async () => {
+    const output = await $`gg --help`.text()
+    expect(/Usage:/.test(output)).toBe(true)
   })
 })

@@ -24,7 +24,7 @@ jobs:
         run: |
           set -x
 
-          echo "/home/runner/.local/bin" >> $GITHUB_PATH
+          # echo "/home/runner/.local/bin" >> $GITHUB_PATH
           echo "out" >> $GITHUB_PATH
 
           mkdir -p /home/runner/.local/bin
@@ -43,5 +43,13 @@ jobs:
           whoami
           echo $PATH
           gg --version
+      - name: Add local bin to PATH
+        run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
+      - name: Test installed version
+        run: |
+          set -x
+          which gg
+          gg --version
+          gg help
       - run: bun test
 
