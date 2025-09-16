@@ -22,13 +22,13 @@ jobs:
       - run: bun run build:linux-x64
       - name: Compile and install
         run: |
-          set -ex
+          set -x
           ls -l out/gg-linux-x64
           ./out/gg-linux-x64 --version
           pwd
           whoami
           echo $PATH
-          mv out/gg-linux-x64 /home/runner/.local/bin/gg
+          cp out/gg-linux-x64 /home/runner/.local/bin/gg
           gg --version
       - run: bun test
 
