@@ -38,7 +38,6 @@ describe("basics", async () => {
     // await $`git commit -m "Added README"`.cwd(tempDir)
 
     const log = await $`git log`.cwd(tempDir).text()
-    console.log({ "GIT LOG": log })
-    // expect(log.includes("Yes that's the title")).toBe(true)
+    expect(log.includes("Yes that's the title")).toBe(true)
   })
 })
