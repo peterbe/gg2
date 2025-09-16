@@ -11,12 +11,10 @@ describe("basics", async () => {
 
   beforeEach(async () => {
     tempDir = await mkdtemp(join(tmpdir(), "gg-test"))
-    // tempDir = await mkdtemp(tmpdir())
     tempConfigFile = join(join(tempDir, ".."), ".gg.json")
     process.env.GG_CONFIG_FILE = tempConfigFile
   })
   afterEach(async () => {
-    // console.log("Removing tempDir", tempDir)
     await rm(tempDir, { recursive: true })
 
     process.env.GG_CONFIG_FILE = original_GG_CONFIG_FILE
@@ -54,7 +52,6 @@ describe("basics", async () => {
     await $`git add README.md`.cwd(tempDir)
 
     await $`echo "Yes that's the title" | gg commit`.cwd(tempDir)
-    // await $`git commit -m "Added README"`.cwd(tempDir)
 
     const log = await $`git log`.cwd(tempDir).text()
     expect(log.includes("Yes that's the title")).toBe(true)
