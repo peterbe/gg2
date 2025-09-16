@@ -28,26 +28,13 @@ export async function configureRepo() {
         value: "upstream-name",
       },
       {
+        name: "Auto-merge PR method",
+        value: "auto-merge-method",
+      },
+      {
         name: "Auto-merge PRs",
         value: "auto-merge",
       },
-
-      //   {
-      //     name: "yarn",
-      //     value: "yarn",
-      //     description: "yarn is an awesome package manager",
-      //   },
-      //   new Separator(),
-      //   {
-      //     name: "jspm",
-      //     value: "jspm",
-      //     disabled: true,
-      //   },
-      //   {
-      //     name: "pnpm",
-      //     value: "pnpm",
-      //     disabled: "(pnpm is not available)",
-      //   },
     ],
   })
   if (answer === "branch-prefix") {
@@ -58,6 +45,8 @@ export async function configureRepo() {
     await configureUpstreamName()
   } else if (answer === "auto-merge") {
     await configureAutoMerge()
+  } else if (answer === "auto-merge-method") {
+    await configureAutoMergeMethod()
   } else {
     warn("No selected thing to configure. Bye")
   }
@@ -132,5 +121,45 @@ async function configureAutoMerge() {
     console.log(
       `New value: ${value ? kleur.green("true") : kleur.red("false")}`,
     )
+  }
+}
+
+async function configureAutoMergeMethod() {
+  const KEY = "auto-merge-method"
+  const config = await getRepoConfig()
+
+  const choices = [
+    {
+      name: "Merge",
+      value: "MERGE",
+    },
+    {
+      name: "Squash",
+      value: "SQUASH",
+    },
+    {
+      name: "Rebase",
+      value: "REBASE",
+    },
+  ]
+  const map = new Map(choices.map((c) => [c.value, c.name]))
+  const answer = await select({
+    message: "Auto-merge method",
+    choices,
+  })
+
+  await storeConfig(KEY, answer)
+
+  if (answer !== config[KEY]) {
+    const before = config[KEY]
+    const beforeName =
+      before && typeof before === "string" ? map.get(before) : undefined
+    if (beforeName) {
+      console.log(
+        `Old value: ${before === undefined ? kleur.italic("not set") : kleur.bold(beforeName)}`,
+      )
+    }
+    const newName = map.get(answer) || answer
+    console.log(`New value: ${kleur.green(newName)}`)
   }
 }

@@ -5,13 +5,19 @@ import simpleGit, { type SimpleGit } from "simple-git"
 import { getDefaultBranch } from "./branch-utils"
 import { deleteLocalBranch } from "./get-back"
 import {
+  enableAutoMergeGraphQL,
   findPRByBranchName,
   getOwnerRepo,
   getPRDetailsByNumber,
   interpretMergeableStatus,
 } from "./github-utils"
 import { error, success, warn } from "./logger"
-import { getGlobalConfig, getUpstreamName, storeGlobalConfig } from "./storage"
+import {
+  getAutoMergeMethod,
+  getGlobalConfig,
+  getUpstreamName,
+  storeGlobalConfig,
+} from "./storage"
 
 type TokenOptions = {
   test?: boolean
@@ -113,6 +119,20 @@ export async function gitHubPR(options: PROptions) {
     await getBack({ git, defaultBranch, currentBranch })
   } else if (prDetails.auto_merge) {
     success("Can auto-merge!")
+  }
+
+  if (prDetails.mergeable_state === "blocked") {
+    const autoMergeMethod = await getAutoMergeMethod()
+    if (autoMergeMethod) {
+      const autoMergeMethodVerbose = `${autoMergeMethod.charAt(0).toUpperCase()}${autoMergeMethod.slice(1).toLowerCase()}`
+      const enableAutoMerge = await confirm({
+        message: `Enable auto-merge (using ${autoMergeMethodVerbose}):`,
+        default: false,
+      })
+      if (enableAutoMerge) {
+        await enableAutoMergeGraphQL(prDetails.node_id, autoMergeMethod)
+      }
+    }
   }
 
   if (watch) {

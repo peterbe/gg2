@@ -98,6 +98,7 @@ program // alias for `github pr`
   .command("pr")
   .description("Get the current GitHub Pull Request for the current branch")
   .option("--watch", "Keep checking the status till it changes")
+  .option("--debug", "Debug mode (shows traceback)")
   .action((options) => {
     wrap(gitHubPR(options), options.debug)
   })
