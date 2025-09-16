@@ -31,6 +31,8 @@ describe("basics", async () => {
 
   test("create branch and commit", async () => {
     await $`git init --initial-branch=main`.cwd(tempDir)
+    await $`git config --global user.email "you@example.com"`.cwd(tempDir)
+    await $`git config --global user.name "Your Name"`.cwd(tempDir)
     await $`echo "# My Project" > README.md`.cwd(tempDir)
     await $`git add README.md`.cwd(tempDir)
     await $`git commit -m "Initial commit"`.cwd(tempDir)
