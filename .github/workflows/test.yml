@@ -25,5 +25,7 @@ jobs:
           ls -l out/gg-linux-x64
           ./out/gg-linux-x64 --version
           echo $PATH
+          pwd
+          whoami
       - run: bun test
 
