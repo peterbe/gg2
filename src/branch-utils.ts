@@ -18,6 +18,8 @@ export async function getDefaultBranch(git: SimpleGit) {
 
     return defaultBranch || "main"
   } catch (err) {
+    console.log("ERROR IN THE CATCH")
+    console.log(err)
     // This can happen if you've never pushed to a remote before
     if (
       err instanceof Error &&

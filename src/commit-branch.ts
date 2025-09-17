@@ -25,7 +25,9 @@ export async function commitBranch(message: string, options: Options) {
   const git = simpleGit()
   const currentBranch = await getCurrentBranch(git)
 
+  console.log("CURRENT BRANCH IS:", { currentBranch })
   const defaultBranch = await getDefaultBranch(git)
+  console.log("DEFAULT BRANCH IS:", { defaultBranch })
   if (defaultBranch === currentBranch) {
     throw new Error(
       `You are on the default branch (${defaultBranch}). Switch to a feature branch before committing.`,
