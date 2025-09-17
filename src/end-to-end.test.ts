@@ -31,6 +31,11 @@ describe("basics", async () => {
 
   test("create branch and commit", async () => {
     await $`git init --initial-branch=main`.cwd(tempDir)
+    const configOutput = await $`git config --get init.defaultBranch`
+      .cwd(tempDir)
+      .text()
+    console.log("GIT CONFIG OUTPUT:", { configOutput })
+
     await $`git config --global user.email "you@example.com"`.cwd(tempDir)
     await $`git config --global user.name "Your Name"`.cwd(tempDir)
     await $`echo "# My Project" > README.md`.cwd(tempDir)
