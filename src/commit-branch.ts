@@ -2,7 +2,7 @@ import { relative } from "node:path"
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
-import { getDefaultBranch } from "./branch-utils"
+import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import {
   createGitHubPR,
   findPRByBranchName,
@@ -23,8 +23,7 @@ export async function commitBranch(message: string, options: Options) {
   const yes = Boolean(options.yes)
   const noVerify = !options.verify
   const git = simpleGit()
-  const branchSummary = await git.branch()
-  const currentBranch = branchSummary.current
+  const currentBranch = await getCurrentBranch(git)
 
   const defaultBranch = await getDefaultBranch(git)
   if (defaultBranch === currentBranch) {

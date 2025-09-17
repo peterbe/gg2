@@ -1,7 +1,7 @@
 import { input } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit from "simple-git"
-import { getDefaultBranch } from "./branch-utils"
+import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { createGitHubPR, findPRByBranchName } from "./github-utils"
 import { warn } from "./logger"
 import { getTitle } from "./storage"
@@ -18,8 +18,7 @@ export async function createPR(options: PROptions) {
   }
 
   const git = simpleGit()
-  const branchSummary = await git.branch()
-  const currentBranch = branchSummary.current
+  const currentBranch = await getCurrentBranch(git)
   const defaultBranch = await getDefaultBranch(git)
   if (defaultBranch === currentBranch) {
     throw new Error(

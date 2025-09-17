@@ -34,3 +34,13 @@ export async function getDefaultBranch(git: SimpleGit) {
     throw err
   }
 }
+
+export async function getCurrentBranch(git: SimpleGit) {
+  const branchSummary = await git.branch(["--show-current"])
+  const currentBranch = branchSummary.current
+  if (currentBranch) {
+    return currentBranch
+  }
+  const rawBranch = await git.raw("branch", "--show-current")
+  return rawBranch.trim()
+}

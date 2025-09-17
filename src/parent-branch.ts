@@ -1,6 +1,7 @@
 import { confirm } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit from "simple-git"
+import { getCurrentBranch } from "./branch-utils"
 import { success, warn } from "./logger"
 
 type Options = {
@@ -10,8 +11,7 @@ type Options = {
 export async function parentBranch(options: Options) {
   const yes = Boolean(options.yes)
   const git = simpleGit()
-  const branchSummary = await git.branch()
-  const currentBranch = branchSummary.current
+  const currentBranch = await getCurrentBranch(git)
 
   const outputFromGit = (
     await simpleGit({ trimmed: true }).raw("show-branch", "-a")

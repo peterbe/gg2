@@ -35,7 +35,7 @@ describe("basics", async () => {
     await $`git config --global user.name "Your Name"`.cwd(tempDir)
     await $`echo "# My Project" > README.md`.cwd(tempDir)
     await $`git add README.md`.cwd(tempDir)
-    await $`git commit -m "Initial commit"`.cwd(tempDir)
+    // await $`git commit -m "Initial commit"`.cwd(tempDir)
 
     await $`echo "This is my new branch" | gg start`.cwd(tempDir)
     const branchName = await $`git branch --show-current`.cwd(tempDir).text()
