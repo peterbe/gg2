@@ -34,10 +34,6 @@ describe("basics", async () => {
 
     // Don't know why this is necessary for the sake of GitHub Actions Linux runners
     await $`git config --global init.defaultBranch main`.cwd(tempDir)
-    const configOutput = await $`git config --get init.defaultBranch`
-      .cwd(tempDir)
-      .text()
-    console.log("GIT CONFIG OUTPUT:", { configOutput })
 
     await $`git config --global user.email "you@example.com"`.cwd(tempDir)
     await $`git config --global user.name "Your Name"`.cwd(tempDir)
