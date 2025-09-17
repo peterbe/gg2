@@ -1,5 +1,5 @@
 import type { SimpleGit } from "simple-git"
-import { error } from "./logger"
+import { error, warn } from "./logger"
 
 export async function getDefaultBranch(git: SimpleGit) {
   try {
@@ -18,9 +18,6 @@ export async function getDefaultBranch(git: SimpleGit) {
 
     return defaultBranch || "main"
   } catch (err) {
-    console.log("ERROR IN THE CATCH")
-    console.log(err)
-
     if (err instanceof Error) console.log({ ERR_MESSSAGE: err.message })
     // This can happen if you've never pushed to a remote before
     if (
@@ -28,10 +25,16 @@ export async function getDefaultBranch(git: SimpleGit) {
       err.message.includes("ref refs/remotes/origin/HEAD is not a symbolic ref")
     ) {
       const result = await git.raw(["config", "--get", "init.defaultBranch"])
-      console.log("GOT RESULT FROM GIT CONFIG --get", { result })
       if (result?.trim()) {
         return result.trim()
       }
+
+      warn(
+        "The command `git config --get init.defaultBranch` failed. Try it manually.",
+      )
+      warn(
+        "You might need to run `git config --global init.defaultBranch main` manually.",
+      )
       error(
         "Unable to determine the default branch by checking the origin/HEAD",
       )

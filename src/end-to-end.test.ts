@@ -31,6 +31,9 @@ describe("basics", async () => {
 
   test("create branch and commit", async () => {
     await $`git init --initial-branch=main`.cwd(tempDir)
+
+    // Don't know why this is necessary for the sake of GitHub Actions Linux runners
+    await $`git config --global init.defaultBranch main`.cwd(tempDir)
     const configOutput = await $`git config --get init.defaultBranch`
       .cwd(tempDir)
       .text()
