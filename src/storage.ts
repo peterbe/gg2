@@ -63,7 +63,6 @@ export async function getTitle(
   branchName: string,
 ): Promise<string | undefined> {
   const [, repoData] = await getRepoData()
-  console.log({ repoData })
   return repoData.BRANCH_TITLES[branchName]
 }
 
