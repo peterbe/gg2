@@ -2,7 +2,7 @@ import { confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import { Octokit } from "octokit"
 import simpleGit, { type SimpleGit } from "simple-git"
-import { getDefaultBranch } from "./branch-utils"
+import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { deleteLocalBranch } from "./get-back"
 import {
   findPRByBranchName,
@@ -79,8 +79,7 @@ type PROptions = {
 export async function gitHubPR(options: PROptions) {
   const watch = Boolean(options.watch)
   const git = simpleGit()
-  const branchSummary = await git.branch()
-  const currentBranch = branchSummary.current
+  const currentBranch = await getCurrentBranch(git)
   const defaultBranch = await getDefaultBranch(git)
   if (defaultBranch === currentBranch) {
     throw new Error(

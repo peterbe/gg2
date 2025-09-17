@@ -33,5 +33,6 @@ jobs:
           which gg
           gg --version
           gg help
+          git --version
       - run: bun test
 

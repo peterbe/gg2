@@ -1,5 +1,5 @@
 import type { SimpleGit } from "simple-git"
-import { error } from "./logger"
+import { error, warn } from "./logger"
 
 export async function getDefaultBranch(git: SimpleGit) {
   try {
@@ -18,6 +18,7 @@ export async function getDefaultBranch(git: SimpleGit) {
 
     return defaultBranch || "main"
   } catch (err) {
+    if (err instanceof Error) console.log({ ERR_MESSSAGE: err.message })
     // This can happen if you've never pushed to a remote before
     if (
       err instanceof Error &&
@@ -27,10 +28,27 @@ export async function getDefaultBranch(git: SimpleGit) {
       if (result?.trim()) {
         return result.trim()
       }
+
+      warn(
+        "The command `git config --get init.defaultBranch` failed. Try it manually.",
+      )
+      warn(
+        "You might need to run `git config --global init.defaultBranch main` manually.",
+      )
       error(
         "Unable to determine the default branch by checking the origin/HEAD",
       )
     }
     throw err
   }
+}
+
+export async function getCurrentBranch(git: SimpleGit) {
+  const branchSummary = await git.branch(["--show-current"])
+  const currentBranch = branchSummary.current
+  if (currentBranch) {
+    return currentBranch
+  }
+  const rawBranch = await git.raw("branch", "--show-current")
+  return rawBranch.trim()
 }

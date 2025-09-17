@@ -1,13 +1,12 @@
 import { confirm } from "@inquirer/prompts"
 import simpleGit from "simple-git"
-import { getDefaultBranch } from "./branch-utils"
+import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { success } from "./logger"
 import { getUpstreamName } from "./storage"
 
 export async function mainMerge() {
   const git = simpleGit()
-  const branchSummary = await git.branch()
-  const currentBranch = branchSummary.current
+  const currentBranch = await getCurrentBranch(git)
 
   const defaultBranch = await getDefaultBranch(git)
   if (defaultBranch === currentBranch) {
