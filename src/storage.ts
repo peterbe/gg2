@@ -17,6 +17,18 @@ export async function storeTitle(
   await db.write(JSON.stringify(data, null, 2))
 }
 
+export async function storeOriginalBranchName(
+  branchName: string,
+  originalBranchName: string,
+): Promise<void> {
+  const [data, repoData] = await getRepoData()
+  if (!repoData.ORIGINAL_BRANCHES) {
+    repoData.ORIGINAL_BRANCHES = {}
+  }
+  repoData.ORIGINAL_BRANCHES[branchName] = originalBranchName
+  await db.write(JSON.stringify(data, null, 2))
+}
+
 type ConfigKeys =
   | "branch-prefix"
   | "title-prefix"
@@ -28,9 +40,12 @@ type GlobalConfigKeys = "github-token" // more to come
 type BranchTitles = Record<string, string>
 type ConfigValues = Record<string, string | boolean>
 
+type OriginalBranches = Record<string, string>
+
 type RepoData = {
   BRANCH_TITLES: BranchTitles
   CONFIG: ConfigValues
+  ORIGINAL_BRANCHES?: OriginalBranches // optional, may not exist in older files
 }
 type StorageObject = {
   REPOS: {
@@ -96,6 +111,7 @@ async function getRepoData(): Promise<[StorageObject, RepoData]> {
     data.REPOS[repoKey] = {
       BRANCH_TITLES: {},
       CONFIG: {},
+      ORIGINAL_BRANCHES: {},
     }
   }
   return [data, data.REPOS[repoKey]]
