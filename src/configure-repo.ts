@@ -1,18 +1,37 @@
+// import { appendFileSync } from "node:fs"
 import { userInfo } from "node:os"
 import { basename } from "node:path"
-
 import { confirm, input, select } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit from "simple-git"
 import { warn } from "./logger"
 import { getRepoConfig, storeConfig } from "./storage"
 
+// const dbg = (s: string) => {
+//   appendFileSync("/tmp/dbg.log", s)
+//   appendFileSync("/tmp/dbg.log", "\n")
+// }
+
+// This exists just to make it possible to bypass the interactive prompt
+// in end-to-end tests.
+async function selectWrappedForTesting(
+  config: Parameters<typeof select>[0],
+): Promise<ReturnType<typeof select>> {
+  // for (const [key, value] of Object.entries(Bun.env)) {
+  //   dbg(`${key}=${value}`)
+  // }
+  if (Bun.env.NODE_ENV === "test" && Bun.env.TEST_CONFIGURE_ANSWER) {
+    return Bun.env.TEST_CONFIGURE_ANSWER
+  }
+  return select(config)
+}
+
 export async function configureRepo() {
   const git = simpleGit()
   const rootPath = await git.revparse(["--show-toplevel"])
   const repoName = basename(rootPath)
 
-  const answer = await select({
+  const answer = await selectWrappedForTesting({
     message: `What do you want to configure (for repo: ${repoName})`,
     choices: [
       {
