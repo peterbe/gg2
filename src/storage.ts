@@ -8,24 +8,19 @@ const configFilePath = process.env.GG_CONFIG_FILE || "~/.gg.json"
 
 const db = Bun.file(expandPath(configFilePath))
 
-export async function storeTitle(
+export async function storeNewBranch(
   branchName: string,
-  title: string,
+  info: {
+    title: string
+    currentBranch: string
+  },
 ): Promise<void> {
   const [data, repoData] = await getRepoData()
-  repoData.BRANCH_TITLES[branchName] = title
-  await db.write(JSON.stringify(data, null, 2))
-}
-
-export async function storeOriginalBranchName(
-  branchName: string,
-  originalBranchName: string,
-): Promise<void> {
-  const [data, repoData] = await getRepoData()
+  repoData.BRANCH_TITLES[branchName] = info.title
   if (!repoData.ORIGINAL_BRANCHES) {
     repoData.ORIGINAL_BRANCHES = {}
   }
-  repoData.ORIGINAL_BRANCHES[branchName] = originalBranchName
+  repoData.ORIGINAL_BRANCHES[branchName] = info.currentBranch
   await db.write(JSON.stringify(data, null, 2))
 }
 

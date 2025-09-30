@@ -1,9 +1,9 @@
 import { input } from "@inquirer/prompts"
 import simpleGit from "simple-git"
+import { getCurrentBranch } from "./branch-utils"
 import { success } from "./logger"
 import { slugifyTitleToBranchName } from "./slugify"
-import { getRepoConfig, storeOriginalBranchName, storeTitle } from "./storage"
-import { getCurrentBranch } from "./branch-utils"
+import { getRepoConfig, storeNewBranch } from "./storage"
 
 type Options = { [k: string]: never }
 
@@ -25,8 +25,8 @@ export async function startBranch(
 
   await git.checkoutLocalBranch(branchName)
   success(`Created new branch: ${branchName}`)
-  await storeTitle(branchName, title)
-  await storeOriginalBranchName(branchName, currentBranch)
+  await storeNewBranch(branchName, { title, currentBranch })
+  // await storeOriginalBranchName(branchName, currentBranch)
 }
 
 async function getTitle(urlOrTitle: string[] | undefined): Promise<string> {
