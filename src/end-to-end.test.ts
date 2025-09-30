@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
-import { tmpdir } from "node:os"
+import { tmpdir, userInfo } from "node:os"
 import { join } from "node:path"
 import { $ } from "bun"
 
@@ -39,7 +39,6 @@ describe("basics", async () => {
     await $`git config --global user.name "Your Name"`.cwd(tempDir)
     await $`echo "# My Project" > README.md`.cwd(tempDir)
     await $`git add README.md`.cwd(tempDir)
-    // await $`git commit -m "Initial commit"`.cwd(tempDir)
 
     await $`echo "This is my new branch" | gg start`.cwd(tempDir)
     const branchName = await $`git branch --show-current`.cwd(tempDir).text()
@@ -65,5 +64,27 @@ describe("basics", async () => {
 
     const log = await $`git log`.cwd(tempDir).text()
     expect(log.includes("Yes that's the title")).toBe(true)
+  })
+
+  test("configure and config", async () => {
+    await $`git init --initial-branch=main`.cwd(tempDir)
+    const config = await $`gg config`.cwd(tempDir).text()
+    expect(config.includes("No configuration found")).toBe(true)
+
+    const defaultBrancPrefix = `${userInfo().username}/`
+    Bun.env.TEST_CONFIGURE_ANSWER = "branch-prefix"
+    try {
+      const o = await $`printf "\n" | gg configure`.cwd(tempDir).text()
+      expect(o.includes("Old value: nothing set")).toBe(true)
+      expect(o.includes(`New value: ${defaultBrancPrefix}`)).toBe(true)
+    } finally {
+      delete Bun.env.TEST_CONFIGURE_ANSWER
+    }
+    const configAfter = JSON.parse(await Bun.file(tempConfigFile).text())
+    const repos = configAfter.REPOS
+    const repoKey = Object.keys(repos).find((key) => key.endsWith(tempDir))
+    const repoConfig = configAfter.REPOS[repoKey as string]
+    expect(repoConfig).toBeDefined()
+    expect(repoConfig.CONFIG["branch-prefix"]).toBe(defaultBrancPrefix)
   })
 })
