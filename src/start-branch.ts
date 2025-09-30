@@ -25,8 +25,7 @@ export async function startBranch(
 
   await git.checkoutLocalBranch(branchName)
   success(`Created new branch: ${branchName}`)
-  await storeNewBranch(branchName, { title, currentBranch })
-  // await storeOriginalBranchName(branchName, currentBranch)
+  await storeNewBranch(branchName, { title, baseBranch: currentBranch })
 }
 
 async function getTitle(urlOrTitle: string[] | undefined): Promise<string> {

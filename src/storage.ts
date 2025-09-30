@@ -12,15 +12,15 @@ export async function storeNewBranch(
   branchName: string,
   info: {
     title: string
-    currentBranch: string
+    baseBranch: string
   },
 ): Promise<void> {
   const [data, repoData] = await getRepoData()
   repoData.BRANCH_TITLES[branchName] = info.title
-  if (!repoData.ORIGINAL_BRANCHES) {
-    repoData.ORIGINAL_BRANCHES = {}
+  if (!repoData.BASE_BRANCHES) {
+    repoData.BASE_BRANCHES = {}
   }
-  repoData.ORIGINAL_BRANCHES[branchName] = info.currentBranch
+  repoData.BASE_BRANCHES[branchName] = info.baseBranch
   await db.write(JSON.stringify(data, null, 2))
 }
 
@@ -40,7 +40,7 @@ type OriginalBranches = Record<string, string>
 type RepoData = {
   BRANCH_TITLES: BranchTitles
   CONFIG: ConfigValues
-  ORIGINAL_BRANCHES?: OriginalBranches // optional, may not exist in older files
+  BASE_BRANCHES?: OriginalBranches // optional, may not exist in older files
 }
 type StorageObject = {
   REPOS: {
@@ -106,7 +106,7 @@ async function getRepoData(): Promise<[StorageObject, RepoData]> {
     data.REPOS[repoKey] = {
       BRANCH_TITLES: {},
       CONFIG: {},
-      ORIGINAL_BRANCHES: {},
+      BASE_BRANCHES: {},
     }
   }
   return [data, data.REPOS[repoKey]]
