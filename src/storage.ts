@@ -8,12 +8,19 @@ const configFilePath = process.env.GG_CONFIG_FILE || "~/.gg.json"
 
 const db = Bun.file(expandPath(configFilePath))
 
-export async function storeTitle(
+export async function storeNewBranch(
   branchName: string,
-  title: string,
+  info: {
+    title: string
+    baseBranch: string
+  },
 ): Promise<void> {
   const [data, repoData] = await getRepoData()
-  repoData.BRANCH_TITLES[branchName] = title
+  repoData.BRANCH_TITLES[branchName] = info.title
+  if (!repoData.BASE_BRANCHES) {
+    repoData.BASE_BRANCHES = {}
+  }
+  repoData.BASE_BRANCHES[branchName] = info.baseBranch
   await db.write(JSON.stringify(data, null, 2))
 }
 
@@ -28,9 +35,12 @@ type GlobalConfigKeys = "github-token" // more to come
 type BranchTitles = Record<string, string>
 type ConfigValues = Record<string, string | boolean>
 
+type OriginalBranches = Record<string, string>
+
 type RepoData = {
   BRANCH_TITLES: BranchTitles
   CONFIG: ConfigValues
+  BASE_BRANCHES?: OriginalBranches // optional, may not exist in older files
 }
 type StorageObject = {
   REPOS: {
@@ -96,6 +106,7 @@ async function getRepoData(): Promise<[StorageObject, RepoData]> {
     data.REPOS[repoKey] = {
       BRANCH_TITLES: {},
       CONFIG: {},
+      BASE_BRANCHES: {},
     }
   }
   return [data, data.REPOS[repoKey]]
