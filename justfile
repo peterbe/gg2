@@ -26,7 +26,6 @@ install:
 
 outdated:
     bun outdated
-    bunx npm-check-updates --interactive
 
 test:
     bun test
@@ -34,5 +33,6 @@ test:
 release:
     bun run release
 
-# alias
-upgrade: outdated
+upgrade:
+    bun update --interactive
+    bunx biome migrate --write
