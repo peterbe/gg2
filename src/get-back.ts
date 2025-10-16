@@ -2,7 +2,7 @@ import { confirm } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { success, warn } from "./logger"
-import { getUpstreamName } from "./storage"
+import { getBaseBranch, getUpstreamName } from "./storage"
 
 type Options = {
   yes?: boolean
@@ -21,8 +21,9 @@ export async function getBack(options: Options) {
   if (!status.isClean()) {
     throw new Error("Current branch is not in a clean state. Run `git status`")
   }
+  const storedBaseBranch = await getBaseBranch(currentBranch)
 
-  await git.checkout(defaultBranch)
+  await git.checkout(storedBaseBranch || defaultBranch)
 
   const upstreamName = await getUpstreamName()
 
