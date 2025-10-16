@@ -28,7 +28,8 @@ type ConfigKeys =
   | "branch-prefix"
   | "title-prefix"
   | "upstream-name"
-  | "offer-auto-merge" // more to come!
+  | "offer-auto-merge"
+  | "disable-pr-creation"
 
 type GlobalConfigKeys = "github-token" // more to come
 
