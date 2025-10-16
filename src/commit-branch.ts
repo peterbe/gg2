@@ -4,6 +4,7 @@ import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import {
+  createGitHubPR,
   findPRByBranchName,
   getGitHubNWO,
   getPRDetailsByNumber,
@@ -11,7 +12,12 @@ import {
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { success, warn } from "./logger"
-import { getRepoConfig, getTitle, getUpstreamName } from "./storage"
+import {
+  getBaseBranch,
+  getRepoConfig,
+  getTitle,
+  getUpstreamName,
+} from "./storage"
 
 type Options = {
   verify?: boolean
@@ -166,19 +172,22 @@ export async function commitBranch(message: string, options: Options) {
       if (createPr) {
         const storedTitle = await getTitle(currentBranch)
         const message = "Title:"
-        const _title = await input({ message, default: storedTitle })
+        const title = await input({ message, default: storedTitle })
+        const storedBaseBranch = await getBaseBranch(currentBranch)
 
-        console.log({ defaultBranch })
-        throw new Error("STOP!")
-        // const data = await createGitHubPR({
-        //   head: currentBranch,
-        //   base: defaultBranch,
-        //   title,
-        //   body: "",
-        //   draft: false,
-        // })
-        // console.log("Pull request created:")
-        // console.log(kleur.bold().green(data.html_url))
+        const baseBranch = storedBaseBranch
+          ? await input({ message: "Base branch:", default: storedBaseBranch })
+          : defaultBranch
+
+        const data = await createGitHubPR({
+          head: currentBranch,
+          base: baseBranch,
+          title,
+          body: "",
+          draft: false,
+        })
+        console.log("Pull request created:")
+        console.log(kleur.bold().green(data.html_url))
       }
     }
   }
