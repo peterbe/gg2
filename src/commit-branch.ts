@@ -4,6 +4,7 @@ import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import {
+  createGitHubPR,
   findPRByBranchName,
   getGitHubNWO,
   getPRDetailsByNumber,
@@ -178,24 +179,15 @@ export async function commitBranch(message: string, options: Options) {
           ? await input({ message: "Base branch:", default: storedBaseBranch })
           : defaultBranch
 
-        console.log({ defaultBranch, storedBaseBranch, title, baseBranch })
-        // if (storedBaseBranch) {
-        //   console.log(
-        //     kleur.dim(
-        //       `Using stored base branch ${kleur.bold(storedBaseBranch)}`,
-        //     ),
-        //   )
-        // }
-        throw new Error("STOP!")
-        // const data = await createGitHubPR({
-        //   head: currentBranch,
-        //   base: baseBranch,
-        //   title,
-        //   body: "",
-        //   draft: false,
-        // })
-        // console.log("Pull request created:")
-        // console.log(kleur.bold().green(data.html_url))
+        const data = await createGitHubPR({
+          head: currentBranch,
+          base: baseBranch,
+          title,
+          body: "",
+          draft: false,
+        })
+        console.log("Pull request created:")
+        console.log(kleur.bold().green(data.html_url))
       }
     }
   }
