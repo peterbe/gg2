@@ -81,7 +81,7 @@ export async function getBaseBranch(
   branchName: string,
 ): Promise<string | undefined> {
   const [, repoData] = await getRepoData()
-  // BASE_BRANCHES may not exist in older files
+  // BASE_BRANCHES may not exist in older files.
   return repoData.BASE_BRANCHES ? repoData.BASE_BRANCHES[branchName] : undefined
 }
 
