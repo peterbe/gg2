@@ -171,21 +171,25 @@ export async function commitBranch(message: string, options: Options) {
       if (createPr) {
         const storedTitle = await getTitle(currentBranch)
         const message = "Title:"
-        const _title = await input({ message, default: storedTitle })
-
+        const title = await input({ message, default: storedTitle })
         const storedBaseBranch = await getBaseBranch(currentBranch)
-        console.log({ defaultBranch, storedBaseBranch, title })
-        if (storedBaseBranch) {
-          console.log(
-            kleur.dim(
-              `Using stored base branch ${kleur.bold(storedBaseBranch)}`,
-            ),
-          )
-        }
+
+        const baseBranch = storedBaseBranch
+          ? await input({ message: "Base branch:", default: storedBaseBranch })
+          : defaultBranch
+
+        console.log({ defaultBranch, storedBaseBranch, title, baseBranch })
+        // if (storedBaseBranch) {
+        //   console.log(
+        //     kleur.dim(
+        //       `Using stored base branch ${kleur.bold(storedBaseBranch)}`,
+        //     ),
+        //   )
+        // }
         throw new Error("STOP!")
         // const data = await createGitHubPR({
         //   head: currentBranch,
-        //   base: storedBaseBranch || defaultBranch,
+        //   base: baseBranch,
         //   title,
         //   body: "",
         //   draft: false,
