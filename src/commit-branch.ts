@@ -12,7 +12,7 @@ import {
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { success, warn } from "./logger"
-import { getTitle, getUpstreamName } from "./storage"
+import { getRepoConfig, getTitle, getUpstreamName } from "./storage"
 
 type Options = {
   verify?: boolean
@@ -156,7 +156,9 @@ export async function commitBranch(message: string, options: Options) {
     }
     console.log("(⌘-click to open URLs)")
 
-    if (!pr) {
+    const config = await getRepoConfig()
+    const disablePRCreation = config["disable-pr-creation"]
+    if (!pr && !disablePRCreation) {
       console.log("")
       const createPr = await confirm({
         message: `Create new PR:`,

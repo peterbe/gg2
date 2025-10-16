@@ -50,6 +50,10 @@ export async function configureRepo() {
         name: "Auto-merge PRs",
         value: "auto-merge",
       },
+      {
+        name: "Disable PR creation",
+        value: "disable-pr-creation",
+      },
 
       //   {
       //     name: "yarn",
@@ -77,6 +81,8 @@ export async function configureRepo() {
     await configureUpstreamName()
   } else if (answer === "auto-merge") {
     await configureAutoMerge()
+  } else if (answer === "disable-pr-creation") {
+    await configureDisablePRCreation()
   } else {
     warn("No selected thing to configure. Bye")
   }
@@ -141,6 +147,24 @@ async function configureAutoMerge() {
   const config = await getRepoConfig()
   const value = await confirm({
     message: `Suggest Auto-merge on PRs:`,
+    default: config[KEY] === undefined ? true : Boolean(config[KEY]),
+  })
+  await storeConfig(KEY, value)
+  if (value !== config[KEY]) {
+    console.log(
+      `Old value: ${config[KEY] === undefined ? kleur.italic("not set") : kleur.bold(JSON.stringify(config[KEY]))}`,
+    )
+    console.log(
+      `New value: ${value ? kleur.green("true") : kleur.red("false")}`,
+    )
+  }
+}
+
+async function configureDisablePRCreation() {
+  const KEY = "disable-pr-creation"
+  const config = await getRepoConfig()
+  const value = await confirm({
+    message: `Disable PR creation after commit:`,
     default: config[KEY] === undefined ? true : Boolean(config[KEY]),
   })
   await storeConfig(KEY, value)
