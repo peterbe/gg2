@@ -11,7 +11,12 @@ import {
 } from "./github-utils"
 import { getHumanAge } from "./human-age"
 import { success, warn } from "./logger"
-import { getRepoConfig, getTitle, getUpstreamName } from "./storage"
+import {
+  getBaseBranch,
+  getRepoConfig,
+  getTitle,
+  getUpstreamName,
+} from "./storage"
 
 type Options = {
   verify?: boolean
@@ -168,11 +173,19 @@ export async function commitBranch(message: string, options: Options) {
         const message = "Title:"
         const _title = await input({ message, default: storedTitle })
 
-        console.log({ defaultBranch })
+        const storedBaseBranch = await getBaseBranch(currentBranch)
+        console.log({ defaultBranch, storedBaseBranch, title })
+        if (storedBaseBranch) {
+          console.log(
+            kleur.dim(
+              `Using stored base branch ${kleur.bold(storedBaseBranch)}`,
+            ),
+          )
+        }
         throw new Error("STOP!")
         // const data = await createGitHubPR({
         //   head: currentBranch,
-        //   base: defaultBranch,
+        //   base: storedBaseBranch || defaultBranch,
         //   title,
         //   body: "",
         //   draft: false,
