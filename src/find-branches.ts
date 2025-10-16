@@ -10,9 +10,11 @@ type Options = {
   number: string
   cleanup?: boolean
   reverse?: boolean
+  cleanupAll?: boolean
 }
 export async function findBranches(search: string, options: Options) {
   const cleanup = Boolean(options.cleanup)
+  const cleanupAll = Boolean(options.cleanupAll)
   const number = Number.parseInt(options.number, 10)
   const reverse = Boolean(options.reverse)
   if (Number.isNaN(number)) {
@@ -83,6 +85,18 @@ export async function findBranches(search: string, options: Options) {
         }
       }
     }
+    if (cleanupAll) {
+      const doDelete = await confirm({
+        message: `Delete all branches locally?`,
+        default: false,
+      })
+      if (doDelete) {
+        for (const { name } of searchResults) {
+          await git.deleteLocalBranch(name)
+          success(`Deleted branch ${kleur.bold(name)}\n`)
+        }
+      }
+    }
   }
 
   const branchNames = branchSummary.all.filter(
@@ -96,7 +110,7 @@ export async function findBranches(search: string, options: Options) {
 
     const merged = isMerged.has(branch)
 
-    if (cleanup && !merged) {
+    if ((cleanup || cleanupAll) && !merged) {
       continue
     }
 

@@ -121,6 +121,10 @@ program
     "--cleanup",
     "Interactively ask about deleting found and *merged* branches",
   )
+  .option(
+    "--cleanup-all",
+    "Interactively ask about deleting *all* found and *merged* branches",
+  )
   .option("--reverse", "Reverse sort order")
   .action((search, options) => {
     wrap(findBranches(search, options), options.debug)
