@@ -36,8 +36,10 @@ export async function branchInfo() {
     //   files: status.files,
     // })
     const files = status.files.length
-    records.Status = kleur.yellow(
-      `Uncommitted changes (${files} file${files === 1 ? "" : "s"})`,
+    records.Status = kleur.bold(
+      kleur.yellow(
+        `Uncommitted changes (${files} file${files === 1 ? "" : "s"})`,
+      ),
     )
     warnings.push("Local branch has uncommitted changes.")
   } else {
@@ -89,6 +91,11 @@ export async function branchInfo() {
       )
       records["Commits Behind"] =
         `${commitsBehind} commit${commitsBehind === 1 ? "" : "s"} behind ${upstreamName}/${currentBranch}`
+      if (commitsBehind > 0) {
+        records["Commits Behind"] = kleur.bold(
+          kleur.yellow(records["Commits Behind"]),
+        )
+      }
 
       if (commitsBehind > 0) {
         warnings.push(
