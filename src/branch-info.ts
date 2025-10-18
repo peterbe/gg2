@@ -28,15 +28,25 @@ export async function branchInfo() {
 
   const status = await git.status()
   if (!status.isClean()) {
-    records.Status = "Uncommitted changes"
+    // console.log({
+    //   ahead: status.ahead,
+    //   behind: status.behind,
+    //   detached: status.detached,
+    //   conflicted: status.conflicted,
+    //   files: status.files,
+    // })
+    const files = status.files.length
+    records.Status = kleur.yellow(
+      `Uncommitted changes (${files} file${files === 1 ? "" : "s"})`,
+    )
     warnings.push("Local branch has uncommitted changes.")
   } else {
-    console.log({
-      ahead: status.ahead,
-      behind: status.behind,
-      detached: status.detached,
-      conflicted: status.conflicted,
-    })
+    // console.log({
+    //   ahead: status.ahead,
+    //   behind: status.behind,
+    //   detached: status.detached,
+    //   conflicted: status.conflicted,
+    // })
   }
   records["Current Branch"] = currentBranch
   records["Default Branch"] = defaultBranch
