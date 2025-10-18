@@ -183,13 +183,6 @@ export async function commitBranch(message: string, options: Options) {
               })
             : defaultBranch
 
-        console.log("\nCreating PR...", {
-          head: currentBranch,
-          base: baseBranch,
-          title,
-          body: "",
-          draft: false,
-        })
         const data = await createGitHubPR({
           head: currentBranch,
           base: baseBranch,
