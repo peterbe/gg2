@@ -24,18 +24,25 @@ export async function branchInfo() {
   }
 
   const records: Record<string, string | null> = {}
+  const warnings: string[] = []
 
   const status = await git.status()
   if (!status.isClean()) {
     records.Status = "Uncommitted changes"
+    warnings.push("Local branch has uncommitted changes.")
+  } else {
+    console.log({
+      ahead: status.ahead,
+      behind: status.behind,
+      detached: status.detached,
+      conflicted: status.conflicted,
+    })
   }
   records["Current Branch"] = currentBranch
   records["Default Branch"] = defaultBranch
 
   const storedBaseBranch = await getBaseBranch(currentBranch)
   records["Base Branch"] = storedBaseBranch || "(not set)"
-
-  const warnings: string[] = []
 
   const upstreamName = await getUpstreamName()
   const remotes = await git.getRemotes(true) // true includes URLs
