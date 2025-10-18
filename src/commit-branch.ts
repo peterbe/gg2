@@ -175,9 +175,13 @@ export async function commitBranch(message: string, options: Options) {
         const title = await input({ message, default: storedTitle })
         const storedBaseBranch = await getBaseBranch(currentBranch)
 
-        const baseBranch = storedBaseBranch
-          ? await input({ message: "Base branch:", default: storedBaseBranch })
-          : defaultBranch
+        const baseBranch =
+          storedBaseBranch && storedBaseBranch !== defaultBranch
+            ? await input({
+                message: "Base branch:",
+                default: storedBaseBranch,
+              })
+            : defaultBranch
 
         const data = await createGitHubPR({
           head: currentBranch,
