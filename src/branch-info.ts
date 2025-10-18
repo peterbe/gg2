@@ -1,6 +1,11 @@
 import kleur from "kleur"
 import simpleGit from "simple-git"
-import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
+import {
+  countCommitsAhead,
+  countCommitsBehind,
+  getCurrentBranch,
+  getDefaultBranch,
+} from "./branch-utils"
 import {
   findBranchByBranchName,
   findPRByBranchName,
@@ -37,6 +42,14 @@ export async function branchInfo() {
 
     const remoteBranch = await findBranchByBranchName(currentBranch)
     records["GitHub Branch"] = remoteBranch ? remoteBranch._links.html : null
+    if (remoteBranch) {
+      const commitsAhead = await countCommitsAhead(git, currentBranch)
+      records["Commits Ahead"] =
+        `${commitsAhead} commit${commitsAhead === 1 ? "" : "s"} ahead ${upstreamName}/${currentBranch}`
+
+      const commitsBehind = await countCommitsBehind(git, currentBranch)
+      records["Commits Behind"] = commitsBehind.toString()
+    }
   }
 
   const longestKeyLength = Math.max(

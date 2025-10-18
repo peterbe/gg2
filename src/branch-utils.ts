@@ -51,3 +51,25 @@ export async function getCurrentBranch(git: SimpleGit) {
   const rawBranch = await git.raw("branch", "--show-current")
   return rawBranch.trim()
 }
+
+export async function countCommitsAhead(git: SimpleGit, branchName: string) {
+  const currentBranch = await getCurrentBranch(git)
+  const result = await git.raw([
+    "rev-list",
+    "--count",
+    `${branchName}..${currentBranch}`,
+  ])
+  const count = parseInt(result.trim(), 10)
+  return count
+}
+
+export async function countCommitsBehind(git: SimpleGit, branchName: string) {
+  const currentBranch = await getCurrentBranch(git)
+  const result = await git.raw([
+    "rev-list",
+    "--count",
+    `${currentBranch}..${branchName}`,
+  ])
+  const count = parseInt(result.trim(), 10)
+  return count
+}
