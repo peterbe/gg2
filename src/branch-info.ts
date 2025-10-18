@@ -36,8 +36,7 @@ export async function branchInfo() {
     records["GitHub PR"] = pr ? pr.html_url : null
 
     const remoteBranch = await findBranchByBranchName(currentBranch)
-    console.log(remoteBranch)
-    // records["GitHub Branch"] = remoteBranch
+    records["GitHub Branch"] = remoteBranch ? remoteBranch._links.html : null
   }
 
   const longestKeyLength = Math.max(
