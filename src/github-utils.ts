@@ -38,6 +38,24 @@ export async function findPRByBranchName(branchName: string) {
   }
 }
 
+export async function findBranchByBranchName(branchName: string) {
+  const octokit = await getOctokit()
+  const [owner, repo] = await getOwnerRepo()
+  try {
+    const { data } = await octokit.rest.repos.getBranch({
+      owner,
+      repo,
+      branch: branchName,
+    })
+    return data
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("Branch not found")) {
+      return null
+    }
+    throw err
+  }
+}
+
 export async function createGitHubPR({
   head,
   base,
