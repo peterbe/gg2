@@ -1,6 +1,7 @@
 import { Command } from "commander"
 
 import { version } from "../package.json"
+import { branchInfo } from "./branch-info"
 import { commitBranch } from "./commit-branch"
 import { configureRepo } from "./configure-repo"
 import { createPR } from "./create-pr"
@@ -110,6 +111,14 @@ program
   )
   .action((options) => {
     wrap(mainMerge(), options.debug)
+  })
+
+program
+  .command("info")
+  .description("Get information about the current branch")
+  .option("--debug", "Debug mode (shows traceback)")
+  .action((options) => {
+    wrap(branchInfo(), options.debug)
   })
 
 program
