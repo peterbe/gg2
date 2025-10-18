@@ -48,11 +48,13 @@ export async function branchInfo() {
     //   conflicted: status.conflicted,
     // })
   }
-  records["Current Branch"] = currentBranch
-  records["Default Branch"] = defaultBranch
+  records["Current Branch"] = kleur.bold(currentBranch)
+  records["Default Branch"] = kleur.bold(defaultBranch)
 
   const storedBaseBranch = await getBaseBranch(currentBranch)
-  records["Base Branch"] = storedBaseBranch || "(not set)"
+  records["Base Branch"] = storedBaseBranch
+    ? kleur.bold(storedBaseBranch)
+    : kleur.dim("(not set)")
 
   const upstreamName = await getUpstreamName()
   const remotes = await git.getRemotes(true) // true includes URLs
@@ -60,12 +62,14 @@ export async function branchInfo() {
   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   const nwo = originUrl && getGitHubNWO(originUrl)
   if (nwo) {
-    records["GitHub Repo"] = nwo || null
+    records["GitHub Repo"] = nwo ? kleur.bold(nwo) : null
     const pr = await findPRByBranchName(currentBranch)
-    records["GitHub PR"] = pr ? pr.html_url : null
+    records["GitHub PR"] = pr ? kleur.bold(pr.html_url) : null
 
     const remoteBranch = await findBranchByBranchName(currentBranch)
-    records["GitHub Branch"] = remoteBranch ? remoteBranch._links.html : null
+    records["GitHub Branch"] = remoteBranch
+      ? kleur.bold(remoteBranch._links.html)
+      : null
     if (remoteBranch) {
       const commitsAhead = await countCommitsAhead(
         git,
@@ -74,6 +78,9 @@ export async function branchInfo() {
       )
       records["Commits Ahead"] =
         `${commitsAhead} commit${commitsAhead === 1 ? "" : "s"} ahead ${upstreamName}/${currentBranch}`
+      if (commitsAhead > 0) {
+        records["Commits Ahead"] = kleur.yellow(records["Commits Ahead"])
+      }
 
       const commitsBehind = await countCommitsBehind(
         git,
@@ -103,9 +110,7 @@ export async function branchInfo() {
   console.log("Branch Information:\n")
   for (const [key, value] of Object.entries(records)) {
     const paddedKey = `${key}:`.padEnd(longestKeyLength + extraPadding, " ")
-    console.log(
-      `  ${paddedKey} ${value === null ? kleur.dim("n/a") : kleur.bold(value)}`,
-    )
+    console.log(`  ${paddedKey} ${value === null ? kleur.dim("n/a") : value}`)
   }
   console.log("")
 
