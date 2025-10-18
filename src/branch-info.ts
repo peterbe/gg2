@@ -24,11 +24,18 @@ export async function branchInfo() {
   }
 
   const records: Record<string, string | null> = {}
+
+  const status = await git.status()
+  if (!status.isClean()) {
+    records.Status = "Uncommitted changes"
+  }
   records["Current Branch"] = currentBranch
   records["Default Branch"] = defaultBranch
 
   const storedBaseBranch = await getBaseBranch(currentBranch)
   records["Base Branch"] = storedBaseBranch || "(not set)"
+
+  const warnings: string[] = []
 
   const upstreamName = await getUpstreamName()
   const remotes = await git.getRemotes(true) // true includes URLs
@@ -43,12 +50,31 @@ export async function branchInfo() {
     const remoteBranch = await findBranchByBranchName(currentBranch)
     records["GitHub Branch"] = remoteBranch ? remoteBranch._links.html : null
     if (remoteBranch) {
-      const commitsAhead = await countCommitsAhead(git, currentBranch)
+      const commitsAhead = await countCommitsAhead(
+        git,
+        currentBranch,
+        upstreamName,
+      )
       records["Commits Ahead"] =
         `${commitsAhead} commit${commitsAhead === 1 ? "" : "s"} ahead ${upstreamName}/${currentBranch}`
 
-      const commitsBehind = await countCommitsBehind(git, currentBranch)
-      records["Commits Behind"] = commitsBehind.toString()
+      const commitsBehind = await countCommitsBehind(
+        git,
+        currentBranch,
+        upstreamName,
+      )
+      records["Commits Behind"] =
+        `${commitsBehind} commit${commitsBehind === 1 ? "" : "s"} behind ${upstreamName}/${currentBranch}`
+
+      if (commitsBehind > 0) {
+        warnings.push(
+          "You might want to pull the latest changes from the remote branch.",
+        )
+      } else if (commitsAhead > 0) {
+        warnings.push(
+          "You might want to push your commits to the remote branch.",
+        )
+      }
     }
   }
 
@@ -65,6 +91,10 @@ export async function branchInfo() {
     )
   }
   console.log("")
+
+  for (const warning of warnings) {
+    warn(warning)
+  }
 
   //   const status = await git.status()
   //   if (!status.isClean()) {
