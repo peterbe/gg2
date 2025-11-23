@@ -1,8 +1,12 @@
-import { relative } from "node:path"
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
-import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
+import {
+  getCurrentBranch,
+  getDefaultBranch,
+  getUnstagedFiles,
+  getUntrackedFiles,
+} from "./branch-utils"
 import {
   createGitHubPR,
   findPRByBranchName,
@@ -237,20 +241,6 @@ async function commit(
       process.exit(exited)
     }
   }
-}
-
-async function getUntrackedFiles(git: SimpleGit): Promise<string[]> {
-  const relativeToRepo = (await git.revparse(["--show-prefix"])) || "."
-  const status = await git.status()
-  return status.not_added
-    .filter((file) => !file.endsWith("~"))
-    .map((file) => relative(relativeToRepo, file))
-}
-
-async function getUnstagedFiles(git: SimpleGit): Promise<string[]> {
-  const relativeToRepo = (await git.revparse(["--show-prefix"])) || "."
-  const status = await git.status()
-  return status.modified.map((file) => relative(relativeToRepo, file))
 }
 
 async function printUnTrackedFiles(files: string[]) {
