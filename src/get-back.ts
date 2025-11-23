@@ -1,6 +1,11 @@
 import { confirm } from "@inquirer/prompts"
 import simpleGit, { type SimpleGit } from "simple-git"
-import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
+import {
+  getCurrentBranch,
+  getDefaultBranch,
+  getUnstagedFiles,
+  getUntrackedFiles,
+} from "./branch-utils"
 import { success, warn } from "./logger"
 import { getBaseBranch, getUpstreamName } from "./storage"
 
@@ -19,7 +24,18 @@ export async function getBack(options: Options) {
 
   const status = await git.status()
   if (!status.isClean()) {
-    throw new Error("Current branch is not in a clean state. Run `git status`")
+    // Is it only untracked files? If so, we can ignore them
+    const untrackedFiles = await getUntrackedFiles(git)
+    const unstagedFiles = await getUnstagedFiles(git)
+    if (unstagedFiles.length > 0) {
+      throw new Error(
+        "Current branch is not in a clean state. Run `git status`",
+      )
+    } else if (untrackedFiles.length > 0) {
+      warn(
+        `There are ${untrackedFiles.length} file${untrackedFiles.length > 1 ? "s" : ""}`,
+      )
+    }
   }
   const storedBaseBranch = await getBaseBranch(currentBranch)
 
