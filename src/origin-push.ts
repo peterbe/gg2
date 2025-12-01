@@ -3,7 +3,7 @@ import simpleGit from "simple-git"
 import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { findPRByBranchName, getGitHubNWO } from "./github-utils"
 import { success } from "./logger"
-import { getUpstreamName } from "./storage"
+import { getBaseBranch, getUpstreamName } from "./storage"
 
 export async function originPush() {
   const git = simpleGit()
@@ -42,11 +42,14 @@ export async function originPush() {
     if (pr) {
       console.log(kleur.bold(pr.html_url))
     } else {
-      console.log(
-        kleur
-          .bold()
-          .green(`https://github.com/${nwo}/pull/new/${currentBranch}`),
-      )
+      let url: string
+      const storedBaseBranch = await getBaseBranch(currentBranch)
+      if (storedBaseBranch && storedBaseBranch !== defaultBranch) {
+        url = `https://github.com/${nwo}/compare/${storedBaseBranch}...${currentBranch}?expand=1`
+      } else {
+        url = `https://github.com/${nwo}/pull/new/${currentBranch}`
+      }
+      console.log(kleur.bold().green(url))
     }
     console.log("(⌘-click to open URLs)")
   }
