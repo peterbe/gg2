@@ -156,12 +156,14 @@ export async function commitBranch(message: string, options: Options) {
       else warn(message)
     } else {
       // e.g. https://github.com/peterbe/admin-peterbecom/pull/new/upgrade-playwright
-
-      console.log(
-        kleur
-          .bold()
-          .green(`https://github.com/${nwo}/pull/new/${currentBranch}`),
-      )
+      let url: string
+      const storedBaseBranch = await getBaseBranch(currentBranch)
+      if (storedBaseBranch && storedBaseBranch !== defaultBranch) {
+        url = `https://github.com/${nwo}/compare/${storedBaseBranch}...${currentBranch}?expand=1`
+      } else {
+        url = `https://github.com/${nwo}/pull/new/${currentBranch}`
+      }
+      console.log(kleur.bold().green(url))
     }
     console.log("(⌘-click to open URLs)")
 
