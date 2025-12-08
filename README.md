@@ -116,3 +116,7 @@ If you want to check the linting without formatting, run:
 bun run lint:check
 ```
 
+## About Homebrew
+
+The code that makes it possible to install with Homebrew is here:
+<https://github.com/peterbe/homebrew-gg2>
