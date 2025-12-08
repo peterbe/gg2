@@ -4,11 +4,24 @@ CLI tool for creating, committing, and generally managing your git branches.
 
 ## Installation
 
-For Linux, download a relase file for your OS on https://github.com/peterbe/gg2/releases
+### Homebrew
 
-For macOS, right now you can't install with Homebrew and your operating system
-won't allow you to download an executable from GitHub and run it. Simplest is to
-clone the repo and compile it yourself:
+```bash
+brew tap peterbe/gg2
+brew install gg2
+```
+
+To set up tab-completion, add this to your `~/.bashrc` or `~/.zshrc` file:
+
+```sh
+source <(gg2 shell-completion)
+```
+
+Now, you should be able to type `gg2 [TAB]` and see all options.
+
+You can also download the release binaries here: <https://github.com/peterbe/gg2/releases>
+
+### From source
 
 ```sh
 git clone https://github.com/peterbe/gg2.git && cd gg2
@@ -17,15 +30,6 @@ bun run build
 cp out/gg ~/bin
 chmod +x ~/bin/gg
 ```
-
-For **bash/zsh autocompletion** add this to your `~/.bashrc` or `~/.zshrc` file:
-
-```sh
-source <(gg shell-completion)
-```
-
-Now, you should be able to type `gg [TAB]` and see all options.
-
 
 ## Compiled
 
