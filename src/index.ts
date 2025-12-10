@@ -135,6 +135,7 @@ program
     "Interactively ask about deleting *all* found and *merged* branches",
   )
   .option("--reverse", "Reverse sort order")
+  .option("-y, --yes", "Push")
   .action((search, options) => {
     wrap(findBranches(search, options), options.debug)
   })

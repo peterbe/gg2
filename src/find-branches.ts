@@ -11,8 +11,10 @@ type Options = {
   cleanup?: boolean
   reverse?: boolean
   cleanupAll?: boolean
+  yes?: boolean
 }
 export async function findBranches(search: string, options: Options) {
+  const yes = Boolean(options.yes)
   const cleanup = Boolean(options.cleanup)
   const cleanupAll = Boolean(options.cleanupAll)
   const number = Number.parseInt(options.number, 10)
@@ -150,10 +152,12 @@ export async function findBranches(search: string, options: Options) {
   ) {
     const found = searchResults[0]
     if (found) {
-      const checkOut = await confirm({
-        message: `Check out (${found.name}):`,
-        default: true,
-      })
+      const checkOut =
+        yes ||
+        (await confirm({
+          message: `Check out (${found.name}):`,
+          default: true,
+        }))
       const status = await git.status()
       if (!status.isClean()) {
         throw new Error(
