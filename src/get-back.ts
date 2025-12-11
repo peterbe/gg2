@@ -33,7 +33,7 @@ export async function getBack(options: Options) {
       )
     } else if (untrackedFiles.length > 0) {
       warn(
-        `There are ${untrackedFiles.length} file${untrackedFiles.length > 1 ? "s" : ""}`,
+        `There are ${untrackedFiles.length} untracked file${untrackedFiles.length > 1 ? "s" : ""}. Going to ignore that`,
       )
     }
   }
