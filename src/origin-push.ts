@@ -1,8 +1,13 @@
 import kleur from "kleur"
 import simpleGit from "simple-git"
-import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
+import {
+  getCurrentBranch,
+  getDefaultBranch,
+  getUnstagedFiles,
+  getUntrackedFiles,
+} from "./branch-utils"
 import { findPRByBranchName, getGitHubNWO } from "./github-utils"
-import { success } from "./logger"
+import { success, warn } from "./logger"
 import { getBaseBranch, getUpstreamName } from "./storage"
 
 export async function originPush() {
@@ -15,10 +20,19 @@ export async function originPush() {
   }
 
   const status = await git.status()
-  // XXX It will say it's not clean if all you have is a new file
-  // that hasn't been staged yet. Make it prompt for override?
   if (!status.isClean()) {
-    throw new Error("Current branch is not in a clean state. Run `git status`")
+    // Is it only untracked files? If so, we can ignore them
+    const untrackedFiles = await getUntrackedFiles(git)
+    const unstagedFiles = await getUnstagedFiles(git)
+    if (unstagedFiles.length > 0) {
+      throw new Error(
+        "Current branch is not in a clean state. Run `git status`",
+      )
+    } else if (untrackedFiles.length > 0) {
+      warn(
+        `There are ${untrackedFiles.length} untracked file${untrackedFiles.length > 1 ? "s" : ""}. Going to ignore that`,
+      )
+    }
   }
 
   const upstreamName = await getUpstreamName()
