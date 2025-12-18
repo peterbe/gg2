@@ -16,7 +16,8 @@
       "!.github",
       "!test-results",
       "!dummy*",
-      "!docs/.vitepress/dist*"
+      "!docs/.vitepress/dist*",
+      "!docs/.vitepress/cache*"
     ]
   },
   "formatter": {
