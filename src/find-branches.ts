@@ -145,7 +145,7 @@ export async function findBranches(search: string, options: Options) {
   }
 
   if (
-    !cleanup &&
+    !(cleanup || cleanupAll) &&
     countFound === 1 &&
     searchResults[0] &&
     searchResults[0].name !== currentBranch
