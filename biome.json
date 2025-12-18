@@ -15,7 +15,8 @@
       "!bun.lock",
       "!.github",
       "!test-results",
-      "!dummy*"
+      "!dummy*",
+      "!docs/.vitepress/dist*"
     ]
   },
   "formatter": {
