@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress"
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  mpa: true, // multi-page app mode
+  //   mpa: true, // multi-page app mode
   title: "gg2",
   description:
     "CLI tool for creating, committing, and generally managing your git branches.",
@@ -22,10 +22,10 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: "Examples",
+        text: "Start",
         items: [
-          { text: "Markdown Examples", link: "/markdown-examples" },
-          { text: "Runtime API Examples", link: "/api-examples" },
+          { text: "Get started", link: "/get-started" },
+          { text: "Get involved", link: "/get-involved" },
         ],
       },
     ],
