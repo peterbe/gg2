@@ -18,6 +18,8 @@ export default defineConfig({
     ["link", { rel: "manifest", href: "/site.webmanifest" }],
   ],
   themeConfig: {
+    logo: "/apple-touch-icon.png",
+    siteTitle: "gg2 - CLI tool for git super powers",
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
