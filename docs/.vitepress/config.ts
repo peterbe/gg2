@@ -1,5 +1,10 @@
 import { defineConfig } from "vitepress"
 
+const firstYear = 2025
+const currentYear = new Date().getFullYear()
+const copyrightYears =
+  firstYear === currentYear ? `${firstYear}` : `${firstYear}-${currentYear}`
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   //   mpa: true, // multi-page app mode
@@ -29,6 +34,11 @@ export default defineConfig({
         ],
       },
     ],
+
+    footer: {
+      message: "Released under the MIT License.",
+      copyright: `Copyright © ${copyrightYears} Peter Bengtsson`,
+    },
 
     socialLinks: [
       { icon: "github", link: "https://github.com/peterbe/gg2" },
