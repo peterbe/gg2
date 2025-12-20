@@ -39,3 +39,10 @@ release:
 upgrade:
     bun update --interactive
     bunx biome migrate --write
+
+docs-dev:
+    bun run docs:dev
+
+docs:
+    bun run docs:build
+    bun run docs:preview
