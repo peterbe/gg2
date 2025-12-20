@@ -5,9 +5,16 @@ on:
         branches:
             - main
     pull_request:
+    workflow_dispatch:
 
 permissions:
     contents: read
+    pages: write
+    id-token: write
+
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
 
 jobs:
     docs:
@@ -17,3 +24,26 @@ jobs:
             - uses: oven-sh/setup-bun@v2
             - run: bun install
             - run: bun run docs:build
+
+            - name: Upload built docs
+              #   if: github.event_name != 'pull_request'
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: docs/.vitepress/dist/
+
+            - name: Deploy to GitHub Pages
+              #   if: github.event_name != 'pull_request'
+              id: deployment
+              uses: actions/deploy-pages@v4
+
+    # deploy:
+    #     runs-on: ubuntu-latest
+    #     needs: build
+    #     environment:
+    #     name: github-pages
+    #     url: ${{ steps.deployment.outputs.page_url }}
+
+    #     steps:
+    #     - name: Deploy to GitHub Pages
+    #         id: deployment
+    #         uses: actions/deploy-pages@v4
