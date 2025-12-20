@@ -42,3 +42,7 @@ upgrade:
 
 docs-dev:
     bun run docs:dev
+
+docs:
+    bun run docs:build
+    bun run docs:preview

@@ -91,5 +91,5 @@ To update the documentation (this!), you can run:
 just docs-dev
 ```
 
-and open <http://localhost:5173/> which reloads automatically when you edit the
+and open `http://localhost:5173/` which reloads automatically when you edit the
 `.md` files.
