@@ -2,6 +2,7 @@ import { confirm } from "@inquirer/prompts"
 import fuzzysort from "fuzzysort"
 import kleur from "kleur"
 import simpleGit, { type BranchSummaryBranch } from "simple-git"
+import { getDefaultBranch } from "./branch-utils"
 import { getHumanAge } from "./human-age"
 import { success, warn } from "./logger"
 
@@ -60,6 +61,8 @@ export async function findBranches(search: string, options: Options) {
     merged: boolean
   }
 
+  const defaultBranch = await getDefaultBranch(git)
+
   async function printSearchResults(searchResults: SearchResult[]) {
     for (const { name, highlit, branchInfo, merged } of searchResults) {
       const date = dates.get(name)
@@ -71,9 +74,11 @@ export async function findBranches(search: string, options: Options) {
         highlit || name,
         branchInfo?.current
           ? kleur.bold().green("   (Your current branch)")
-          : merged
-            ? kleur.cyan("  (merged already)")
-            : "",
+          : name === defaultBranch
+            ? kleur.cyan("   (default branch)")
+            : merged
+              ? kleur.cyan("  (merged already)")
+              : "",
       )
 
       if (cleanup) {
