@@ -86,6 +86,11 @@ gg2 commit "The o'clock costs $10 < you & me"
 But remember, the `gg2 commit` is always interactive. It just suggests and prefills
 the commit message. You can type `gg2 commit` and override the default prompt.
 
+```text
+➜  gg2 git:(peterbe-write-a-features-page-for-documentation) ✗ gg2 commit
+✔ Title: add more sections
+```
+
 ## `branches`
 
 The `gg2 branches` command is like `git branch` which lists your branches, including
@@ -131,4 +136,98 @@ And if the filtering leads to exactly 1 match, it offers to check that branch ou
 
 You can also use `gg2 branches --cleanup-all` to delete the local branches that are
 already merged into the default branch.
+
+## `mainmerge` and `mastermerge`
+
+The two are aliases for each other. Actually, if *your* default branch in your `git`
+repo is `master` but you type `gg2 mainmerge` it does exact same thing as if you
+had typed `gg2 mastermerge`. What it does is essentially this, under the hood:
+
+```text
+git checkout main
+git pull origin main
+git checkout -   # takes you back to the branch you were on earlier
+git merge main
+```
+
+If all goes well, it will interactively ask if you want to push to the remote origin.
+
+## `getback` and `pr`
+
+A very common thing is that you're in branch `my-foo-bar-x` and unknown to your
+computer, that branch's GitHub PR has been merged into the default branch. What
+`gg2 getback` does is the "cleaning up action" of taking you back to the default branch.
+It will interactively try to remove the branch if possible, essentially making these
+commands for you:
+
+```text
+git checkout main
+git pull origin main
+git branch -d my-foo-bar-x
+```
+
+The `getback` command is baked into the `pr` branch, if the PR the branch belongs
+to has been merged into the default branch. It also makes it very convenient to
+get a link to the PR for the current branch you're on.
+
+```text
+➜  gg2 git:(peterbe-write-a-features-page-for-documentation) gg2 pr
+Number #85 https://github.com/peterbe/gg2/pull/85 OPEN
+PR Title: Write a Features page for documentation
+PR is ready to merge - all checks passed
+```
+
+If it were to find that the PR has been merged, it will ask if you want to go
+back to the default branch and clean up the feature branch.
+
+## `github`
+
+The `gg2 github` command is a parent for multiple sub-commands, namely:
+
+1. `gg2 github token` - For setting a GitHub personal access token
+1. `gg2 github pr` - Get information about the PR for the current branch, if any
+1. `gg2 github create` - Create a new PR from the command line from the current branch
+
+## `configure`, `config`, and `info`
+
+The `configure` command is and interactive guide to the various configurations you
+can set. For example:
+
+- `Common branch prefix`
+- `Common title prefix`
+- `Upstream name`
+
+And you can see all your current configurations with the command `gg2 config`.
+Example:
+
+```text
+➜  gg2 git:(peterbe-write-a-features-page-for-documentation) ✗ gg2 config
+KEY                             VALUE
+--------------------------------------------
+branch-prefix:                  "peterbe-"
+title-prefix:                   ""
+upstream-name:                  "origin"
+offer-auto-merge:               true
+auto-merge-method:              "MERGE"
+```
+
+The `gg2 info` command is quite helpful to get information about the current branch.
+Example:
+
+```text
+➜  gg2 git:(peterbe-write-a-features-page-for-documentation) ✗ gg2 info
+Branch Information:
+
+  Status:          Uncommitted changes (1 file)
+  Current Branch:  peterbe-write-a-features-page-for-documentation
+  Default Branch:  main
+  Base Branch:     main
+  GitHub Repo:     peterbe/gg2
+  GitHub PR:       https://github.com/peterbe/gg2/pull/85
+  GitHub Branch:   https://github.com/peterbe/gg2/tree/peterbe-write-a-features-page-for-documentation
+  Commits Ahead:   0 commits ahead origin/peterbe-write-a-features-page-for-documentation
+  Commits Behind:  0 commits behind origin/peterbe-write-a-features-page-for-documentation
+
+Local branch has uncommitted changes.
+```
 
