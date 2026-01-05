@@ -23,6 +23,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
+      { text: "Features", link: "/features" },
       { text: "Get started", link: "/get-started" },
       { text: "Get involved", link: "/get-involved" },
     ],
@@ -34,6 +35,10 @@ export default defineConfig({
           { text: "Get started", link: "/get-started" },
           { text: "Get involved", link: "/get-involved" },
         ],
+      },
+      {
+        text: "About",
+        items: [{ text: "Features", link: "/features" }],
       },
     ],
 
