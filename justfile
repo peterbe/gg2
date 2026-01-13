@@ -3,7 +3,7 @@
 
 dev:
     echo "This will constantly build and copy executable to ~/bin/gg"
-    bun build --watch src/index.ts --target=bun --outfile ~/bin/gg --compile
+    bun build --watch src/index.ts --target=bun --outfile ~/bin/gg --compile --bytecode
 
 build:
     bun run build
