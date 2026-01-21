@@ -109,8 +109,9 @@ program
   .description(
     "Merge the origin_name/default_branch into the the current branch",
   )
+  .option("-y, --yes", "Push")
   .action((options) => {
-    wrap(mainMerge(), options.debug)
+    wrap(mainMerge(options), options.debug)
   })
 
 program

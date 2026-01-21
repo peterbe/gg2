@@ -4,7 +4,12 @@ import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { success } from "./logger"
 import { getUpstreamName } from "./storage"
 
-export async function mainMerge() {
+type Options = {
+  yes?: boolean
+}
+
+export async function mainMerge(options: Options) {
+  const yes = Boolean(options.yes)
   const git = simpleGit()
   const currentBranch = await getCurrentBranch(git)
 
@@ -38,10 +43,12 @@ export async function mainMerge() {
 
   let pushToRemote = false
   if (!pushToRemote && origin) {
-    pushToRemote = await confirm({
-      message: `Push to ${originName}:`,
-      default: false,
-    })
+    pushToRemote =
+      yes ||
+      (await confirm({
+        message: `Push to ${originName}:`,
+        default: false,
+      }))
   }
 
   if (pushToRemote) {
