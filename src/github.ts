@@ -78,7 +78,7 @@ type PROptions = {
 }
 
 export async function gitHubPR(options: PROptions) {
-  const watch = Boolean(options.watch)
+  let watch = Boolean(options.watch)
   const git = simpleGit()
   const currentBranch = await getCurrentBranch(git)
   const defaultBranch = await getDefaultBranch(git)
@@ -111,6 +111,7 @@ export async function gitHubPR(options: PROptions) {
     await isBehind({ git, defaultBranch, currentBranch })
   } else if (prDetails.state === "closed" && prDetails.merged) {
     await getBack({ git, defaultBranch, currentBranch })
+    watch = false
   } else if (prDetails.auto_merge) {
     success("Can auto-merge!")
   }
