@@ -158,7 +158,7 @@ export async function commitBranch(message: string, options: Options) {
         // Wait a bit and try again
         // const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
         // const spinner =
-        await sleep(3000)
+        await sleep(2000)
         prDetails = await getPRDetailsByNumber(pr.number)
       }
       if (spinner) {
