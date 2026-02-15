@@ -141,7 +141,7 @@ export async function commitBranch(message: string, options: Options) {
       // Force a slight delay because sometimes it says the PR is
       // ready to merge, even though you've just pushed more commits.
       const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
-      await sleep(2000)
+      await sleep(1500)
       spinner.stop()
 
       let prDetails = await getPRDetailsByNumber(pr.number)
@@ -153,7 +153,7 @@ export async function commitBranch(message: string, options: Options) {
         const spinner = yoctoSpinner({
           text: `PR mergeable state is unknown. Trying again... (${retries})`,
         }).start()
-        await sleep(2000)
+        await sleep(1500)
         spinner.stop()
         prDetails = await getPRDetailsByNumber(pr.number)
       }
