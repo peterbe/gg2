@@ -144,23 +144,14 @@ export async function commitBranch(message: string, options: Options) {
 
       let prDetails = await getPRDetailsByNumber(pr.number)
       let retries = 3
-      // const spinner =
-      //   prDetails.mergeable_state === "unknown"
-      //     ? yoctoSpinner({
-      //         text: `PR mergeable state is unknown. Trying again...`,
-      //       }).start()
-      //     : null
       while (prDetails.mergeable_state === "unknown" && retries-- > 0) {
         // Wait a bit and try again
         await delay(
-          2000,
+          1500,
           `PR mergeable state is unknown. Trying again... (${retries})`,
         )
         prDetails = await getPRDetailsByNumber(pr.number)
       }
-      // if (spinner) {
-      //   spinner.stop()
-      // }
 
       const { message, canMerge, hasWarning } =
         interpretMergeableStatus(prDetails)
