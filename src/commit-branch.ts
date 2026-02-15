@@ -147,7 +147,7 @@ export async function commitBranch(message: string, options: Options) {
       while (prDetails.mergeable_state === "unknown" && retries-- > 0) {
         // Wait a bit and try again
         await delay(
-          1500,
+          1000,
           `PR mergeable state is unknown. Trying again... (${retries})`,
         )
         prDetails = await getPRDetailsByNumber(pr.number)
