@@ -140,22 +140,29 @@ export async function commitBranch(message: string, options: Options) {
 
       // Force a slight delay because sometimes it says the PR is
       // ready to merge, even though you've just pushed more commits.
-      const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
-      await sleep(2000)
-      spinner.stop()
+      // const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
+      // await sleep(2000)
+      // spinner.stop()
+      await delay(3000, "Loading PR details...")
 
       let prDetails = await getPRDetailsByNumber(pr.number)
       let retries = 3
+      const spinner =
+        prDetails.mergeable_state === "unknown"
+          ? yoctoSpinner({
+              text: `PR mergeable state is unknown. Trying again... (${retries})`,
+            }).start()
+          : null
       while (prDetails.mergeable_state === "unknown" && retries-- > 0) {
         // warn(`PR mergeable state is unknown. Trying again... (${retries})`)
         // Wait a bit and try again
         // const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
-        const spinner = yoctoSpinner({
-          text: `PR mergeable state is unknown. Trying again... (${retries})`,
-        }).start()
+        // const spinner =
         await sleep(3000)
-        spinner.stop()
         prDetails = await getPRDetailsByNumber(pr.number)
+      }
+      if (spinner) {
+        spinner.stop()
       }
 
       const { message, canMerge, hasWarning } =
@@ -209,6 +216,12 @@ export async function commitBranch(message: string, options: Options) {
       }
     }
   }
+}
+
+async function delay(ms: number, text: string) {
+  const spinner = yoctoSpinner({ text }).start()
+  await sleep(ms)
+  spinner.stop()
 }
 
 async function commit(
