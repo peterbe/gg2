@@ -5,22 +5,23 @@
     "": {
       "name": "gg2",
       "dependencies": {
-        "@inquirer/prompts": "^8.2.0",
-        "commander": "^14.0.1",
+        "@inquirer/prompts": "^8.2.1",
+        "commander": "^14.0.3",
         "fuzzysort": "^3.1.0",
         "kleur": "^4.1.5",
-        "octokit": "^5.0.3",
-        "simple-git": "^3.28.0",
+        "octokit": "^5.0.5",
+        "simple-git": "^3.31.1",
+        "yocto-spinner": "^1.1.0",
       },
       "devDependencies": {
         "@biomejs/biome": "2.3.11",
         "@types/bun": "1.3.5",
         "husky": "^9.1.7",
-        "np": "^10.2.0",
-        "vitepress": "^2.0.0-alpha.15",
+        "np": "^10.3.0",
+        "vitepress": "^2.0.0-alpha.16",
       },
       "peerDependencies": {
-        "typescript": "^5.9.3",
+        "typescript": "^5.8.3",
       },
     },
   },
@@ -912,6 +913,8 @@
     "wrap-ansi": ["wrap-ansi@6.2.0", "", { "dependencies": { "ansi-styles": "^4.0.0", "string-width": "^4.1.0", "strip-ansi": "^6.0.0" } }, "sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA=="],
 
     "xdg-basedir": ["xdg-basedir@5.1.0", "", {}, "sha512-GCPAHLvrIH13+c0SuacwvRYj2SxJXQ4kaVTT5xgL3kPrz56XxkF21IGhjSE1+W0aw7gpBWRGXLCPnPby6lSpmQ=="],
+
+    "yocto-spinner": ["yocto-spinner@1.1.0", "", { "dependencies": { "yoctocolors": "^2.1.1" } }, "sha512-/BY0AUXnS7IKO354uLLA2eRcWiqDifEbd6unXCsOxkFDAkhgUL3PH9X2bFoaU0YchnDXsF+iKleeTLJGckbXfA=="],
 
     "yoctocolors": ["yoctocolors@2.1.1", "", {}, "sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ=="],
 

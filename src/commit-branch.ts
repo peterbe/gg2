@@ -7,6 +7,7 @@ import {
   getUnstagedFiles,
   getUntrackedFiles,
 } from "./branch-utils"
+import { delay } from "./delay"
 import {
   createGitHubPR,
   findPRByBranchName,
@@ -139,14 +140,16 @@ export async function commitBranch(message: string, options: Options) {
 
       // Force a slight delay because sometimes it says the PR is
       // ready to merge, even though you've just pushed more commits.
-      await sleep(2000)
+      await delay(2000, "Loading PR details...")
 
       let prDetails = await getPRDetailsByNumber(pr.number)
       let retries = 3
       while (prDetails.mergeable_state === "unknown" && retries-- > 0) {
-        warn(`PR mergeable state is unknown. Trying again... (${retries})`)
         // Wait a bit and try again
-        await sleep(2000)
+        await delay(
+          1000,
+          `PR mergeable state is unknown. Trying again... (${retries})`,
+        )
         prDetails = await getPRDetailsByNumber(pr.number)
       }
 
@@ -253,8 +256,4 @@ async function printUnTrackedFiles(files: string[]) {
     const age = getHumanAge(stats.mtime)
     console.log(`${filePath.padEnd(longestFileName + 10, " ")}  ${age} old`)
   }
-}
-
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }

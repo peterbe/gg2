@@ -3,6 +3,7 @@ import kleur from "kleur"
 import { Octokit } from "octokit"
 import simpleGit, { type SimpleGit } from "simple-git"
 import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
+import { delay } from "./delay"
 import { deleteLocalBranch } from "./get-back"
 import {
   findPRByBranchName,
@@ -120,14 +121,13 @@ export async function gitHubPR(options: PROptions) {
     let attempts = 0
     const SLEEP_TIME_SECONDS = 5
     while (true) {
-      console.log(
-        `Watching (checking every ${SLEEP_TIME_SECONDS} seconds, attempt number ${attempts + 1})...`,
+      await delay(
+        SLEEP_TIME_SECONDS * 1000,
+        `Waiting before checking again... (attempt ${attempts + 1})`,
       )
-      await sleep(SLEEP_TIME_SECONDS * 1000)
       const prDetails = await getPRDetailsByNumber(pr.number)
       const { message, canMerge, hasWarning } =
         interpretMergeableStatus(prDetails)
-      console.clear()
       console.log(kleur.bold(`PR Title: ${prDetails.title}`))
       if (canMerge && !hasWarning) success(message)
       else warn(message)
@@ -145,10 +145,6 @@ export async function gitHubPR(options: PROptions) {
       }
     }
   }
-}
-
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 async function isBehind({
