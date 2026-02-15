@@ -1,6 +1,7 @@
 import { checkbox, confirm, input } from "@inquirer/prompts"
 import kleur from "kleur"
 import simpleGit, { type SimpleGit } from "simple-git"
+import yoctoSpinner from "yocto-spinner"
 import {
   getCurrentBranch,
   getDefaultBranch,
@@ -139,14 +140,18 @@ export async function commitBranch(message: string, options: Options) {
 
       // Force a slight delay because sometimes it says the PR is
       // ready to merge, even though you've just pushed more commits.
+      const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
       await sleep(2000)
+      spinner.stop()
 
       let prDetails = await getPRDetailsByNumber(pr.number)
       let retries = 3
       while (prDetails.mergeable_state === "unknown" && retries-- > 0) {
         warn(`PR mergeable state is unknown. Trying again... (${retries})`)
         // Wait a bit and try again
+        const spinner = yoctoSpinner({ text: "Loading PR details…" }).start()
         await sleep(2000)
+        spinner.stop()
         prDetails = await getPRDetailsByNumber(pr.number)
       }
 
