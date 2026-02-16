@@ -1,7 +1,11 @@
 import { confirm } from "@inquirer/prompts"
 import fuzzysort from "fuzzysort"
 import kleur from "kleur"
-import simpleGit, { type BranchSummaryBranch } from "simple-git"
+import simpleGit, {
+  type BranchSummary,
+  type BranchSummaryBranch,
+  type SimpleGit,
+} from "simple-git"
 import {
   getDefaultBranch,
   getUnstagedFiles,
@@ -32,30 +36,11 @@ export async function findBranches(search: string, options: Options) {
   const currentBranchSummary = await git.branch()
   const currentBranch = currentBranchSummary.current
 
-  const rawDates = await git.raw(
-    "branch",
-    "--all",
-    "--format=%(refname:short)|%(committerdate:iso)",
-  )
-  const dates = new Map<string, Date>()
-  for (const line of rawDates.split(/\n+/g)) {
-    const [refname, dateStr] = line.split("|")
-    if (refname && dateStr) {
-      dates.set(refname, new Date(dateStr))
-    }
-  }
-
-  const isMerged = new Set<string>()
-  const rawMerged = await git.raw("branch", "--all", "--merged")
-  for (const line of rawMerged.split(/\n+/g)) {
-    if (line.trim()) {
-      isMerged.add(line.trim())
-    }
-  }
-
-  const branchSummary = await git.branch([
-    "--all",
-    reverse ? "--sort=committerdate" : "--sort=-committerdate",
+  // TODO: can some of these be combined?
+  const [dates, isMerged, branchSummary] = await Promise.all([
+    getAllBranchDates(git),
+    getAllMergedBranches(git),
+    getBranchSummary(git, reverse),
   ])
 
   type SearchResult = {
@@ -189,4 +174,45 @@ export async function findBranches(search: string, options: Options) {
       }
     }
   }
+}
+
+async function getAllBranchDates(git: SimpleGit): Promise<Map<string, Date>> {
+  const rawDates = await git.raw(
+    "branch",
+    "--all",
+    "--format=%(refname:short)|%(committerdate:iso)",
+  )
+  const dates = new Map<string, Date>()
+  for (const line of rawDates.split(/\n+/g)) {
+    const [refname, dateStr] = line.split("|")
+    if (refname && dateStr) {
+      dates.set(refname, new Date(dateStr))
+    }
+  }
+  return dates
+}
+
+async function getAllMergedBranches(git: SimpleGit): Promise<Set<string>> {
+  // const t0 = performance.now()
+  const isMerged = new Set<string>()
+  const rawMerged = await git.raw("branch", "--all", "--merged")
+  for (const line of rawMerged.split(/\n+/g)) {
+    if (line.trim()) {
+      isMerged.add(line.trim())
+    }
+  }
+  // const t1 = performance.now()
+  // console.log(t1 - t0, "ms to get merged branches")
+  return isMerged
+}
+
+async function getBranchSummary(
+  git: SimpleGit,
+  reverse: boolean,
+): Promise<BranchSummary> {
+  const branchSummary = await git.branch([
+    "--all",
+    reverse ? "--sort=committerdate" : "--sort=-committerdate",
+  ])
+  return branchSummary
 }
