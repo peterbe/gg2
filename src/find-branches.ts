@@ -22,6 +22,14 @@ type Options = {
   cleanupAll?: boolean
   yes?: boolean
 }
+
+type SearchResult = {
+  name: string
+  highlit?: string
+  branchInfo?: BranchSummaryBranch
+  merged: boolean
+}
+
 export async function findBranches(search: string, options: Options) {
   const yes = Boolean(options.yes)
   const cleanup = Boolean(options.cleanup)
@@ -33,24 +41,15 @@ export async function findBranches(search: string, options: Options) {
   }
 
   const git = simpleGit()
-  const currentBranchSummary = await git.branch()
-  const currentBranch = currentBranchSummary.current
-
   // TODO: can some of these be combined?
-  const [dates, isMerged, branchSummary] = await Promise.all([
-    getAllBranchDates(git),
-    getAllMergedBranches(git),
-    getBranchSummary(git, reverse),
-  ])
-
-  type SearchResult = {
-    name: string
-    highlit?: string
-    branchInfo?: BranchSummaryBranch
-    merged: boolean
-  }
-
-  const defaultBranch = await getDefaultBranch(git)
+  const [defaultBranch, currentBranch, dates, isMerged, branchSummary] =
+    await Promise.all([
+      getDefaultBranch(git),
+      getCurrentBranch(git),
+      getAllBranchDates(git),
+      getAllMergedBranches(git),
+      getBranchSummary(git, reverse),
+    ])
 
   async function printSearchResults(searchResults: SearchResult[]) {
     for (const { name, highlit, branchInfo, merged } of searchResults) {
@@ -215,4 +214,8 @@ async function getBranchSummary(
     reverse ? "--sort=committerdate" : "--sort=-committerdate",
   ])
   return branchSummary
+}
+
+async function getCurrentBranch(git: SimpleGit): Promise<string> {
+  return (await git.branch()).current
 }
