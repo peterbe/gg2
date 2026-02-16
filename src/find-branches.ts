@@ -1,7 +1,7 @@
 import { confirm } from "@inquirer/prompts"
 import fuzzysort from "fuzzysort"
 import kleur from "kleur"
-import simpleGit, { type BranchSummaryBranch } from "simple-git"
+import simpleGit, { type SimpleGit } from "simple-git"
 import {
   getDefaultBranch,
   getUnstagedFiles,
@@ -18,6 +18,15 @@ type Options = {
   cleanupAll?: boolean
   yes?: boolean
 }
+
+type SearchResult = {
+  name: string
+  highlit?: string
+  // branchInfo?: BranchSummaryBranch
+  current?: boolean
+  merged: boolean
+}
+
 export async function findBranches(search: string, options: Options) {
   const yes = Boolean(options.yes)
   const cleanup = Boolean(options.cleanup)
@@ -29,46 +38,16 @@ export async function findBranches(search: string, options: Options) {
   }
 
   const git = simpleGit()
-  const currentBranchSummary = await git.branch()
-  const currentBranch = currentBranchSummary.current
 
-  const rawDates = await git.raw(
-    "branch",
-    "--all",
-    "--format=%(refname:short)|%(committerdate:iso)",
-  )
-  const dates = new Map<string, Date>()
-  for (const line of rawDates.split(/\n+/g)) {
-    const [refname, dateStr] = line.split("|")
-    if (refname && dateStr) {
-      dates.set(refname, new Date(dateStr))
-    }
-  }
-
-  const isMerged = new Set<string>()
-  const rawMerged = await git.raw("branch", "--all", "--merged")
-  for (const line of rawMerged.split(/\n+/g)) {
-    if (line.trim()) {
-      isMerged.add(line.trim())
-    }
-  }
-
-  const branchSummary = await git.branch([
-    "--all",
-    reverse ? "--sort=committerdate" : "--sort=-committerdate",
+  const [defaultBranch, currentBranch, dates, isMerged] = await Promise.all([
+    getDefaultBranch(git),
+    getCurrentBranch(git),
+    getAllBranchDates(git),
+    getAllMergedBranches(git),
   ])
 
-  type SearchResult = {
-    name: string
-    highlit?: string
-    branchInfo?: BranchSummaryBranch
-    merged: boolean
-  }
-
-  const defaultBranch = await getDefaultBranch(git)
-
   async function printSearchResults(searchResults: SearchResult[]) {
-    for (const { name, highlit, branchInfo, merged } of searchResults) {
+    for (const { name, highlit, current, merged } of searchResults) {
       const date = dates.get(name)
       console.log(
         `${date ? kleur.dim(`${getHumanAge(date)} ago`) : kleur.italic("no date")}`.padEnd(
@@ -76,7 +55,7 @@ export async function findBranches(search: string, options: Options) {
           " ",
         ),
         highlit || name,
-        branchInfo?.current
+        current
           ? kleur.bold().green("   (Your current branch)")
           : name === defaultBranch
             ? kleur.cyan("   (default branch)")
@@ -110,14 +89,20 @@ export async function findBranches(search: string, options: Options) {
     }
   }
 
-  const branchNames = branchSummary.all.filter(
-    (name) => !name.startsWith("remotes/origin/"),
-  )
+  const branchNames = Array.from(dates.entries())
+    .filter(([name]) => !name.startsWith("origin/") && name !== "origin")
+    .sort((a, b) => {
+      const dateA = a[1].getTime()
+      const dateB = b[1].getTime()
+      return reverse ? dateA - dateB : dateB - dateA
+    })
+    .map(([name]) => name)
+
   let countFound = 0
   const foundBranchNames = branchNames
   const searchResults: SearchResult[] = []
   for (const branch of foundBranchNames) {
-    const branchInfo = branchSummary.branches[branch]
+    const current = branch === currentBranch
 
     const merged = isMerged.has(branch)
 
@@ -135,13 +120,13 @@ export async function findBranches(search: string, options: Options) {
       searchResults.push({
         name: branch,
         highlit: matched.highlight("\x1b[1m", "\x1b[0m"),
-        branchInfo,
+        current,
         merged,
       })
     } else {
       searchResults.push({
         name: branch,
-        branchInfo,
+        current,
         merged,
       })
     }
@@ -189,4 +174,35 @@ export async function findBranches(search: string, options: Options) {
       }
     }
   }
+}
+
+async function getAllBranchDates(git: SimpleGit): Promise<Map<string, Date>> {
+  const rawDates = await git.raw(
+    "branch",
+    "--all",
+    "--format=%(refname:short)|%(committerdate:iso)",
+  )
+  const dates = new Map<string, Date>()
+  for (const line of rawDates.split(/\n+/g)) {
+    const [refname, dateStr] = line.split("|")
+    if (refname && dateStr) {
+      dates.set(refname, new Date(dateStr))
+    }
+  }
+  return dates
+}
+
+async function getAllMergedBranches(git: SimpleGit): Promise<Set<string>> {
+  const isMerged = new Set<string>()
+  const rawMerged = await git.raw("branch", "--all", "--merged")
+  for (const line of rawMerged.split(/\n+/g)) {
+    if (line.trim()) {
+      isMerged.add(line.trim())
+    }
+  }
+  return isMerged
+}
+
+async function getCurrentBranch(git: SimpleGit): Promise<string> {
+  return (await git.branch()).current
 }
