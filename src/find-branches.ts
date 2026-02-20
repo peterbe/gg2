@@ -194,7 +194,7 @@ async function getAllBranchDates(git: SimpleGit): Promise<Map<string, Date>> {
 
 async function getAllMergedBranches(git: SimpleGit): Promise<Set<string>> {
   const isMerged = new Set<string>()
-  const rawMerged = await git.raw("branch", "--all", "--merged")
+  const rawMerged = await git.raw("branch", "--merged")
   for (const line of rawMerged.split(/\n+/g)) {
     if (line.trim()) {
       isMerged.add(line.trim())
