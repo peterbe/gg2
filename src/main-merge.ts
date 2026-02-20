@@ -2,7 +2,7 @@ import { confirm } from "@inquirer/prompts"
 import simpleGit from "simple-git"
 import { getCurrentBranch, getDefaultBranch } from "./branch-utils"
 import { success } from "./logger"
-import { getUpstreamName } from "./storage"
+import { getBaseBranch, getUpstreamName } from "./storage"
 
 type Options = {
   yes?: boolean
@@ -31,15 +31,18 @@ export async function mainMerge(options: Options) {
   if (!origin?.name) {
     throw new Error(`Could not find a remote called '${upstreamName}'`)
   }
+
   const originName = origin.name
+  const baseBranch = await getBaseBranch(currentBranch)
+  if (!baseBranch) {
+    throw new Error("The base branch is not known for this branch.")
+  }
 
-  await git.fetch(originName, defaultBranch)
+  await git.fetch(originName, baseBranch)
 
-  await git.mergeFromTo(originName, defaultBranch)
+  await git.mergeFromTo(originName, baseBranch)
 
-  success(
-    `Latest ${originName}/${defaultBranch} branch merged into this branch.`,
-  )
+  success(`Latest ${originName}/${baseBranch} branch merged into this branch.`)
 
   let pushToRemote = false
   if (!pushToRemote && origin) {
