@@ -27,7 +27,6 @@ export async function mainMerge(options: Options) {
 
   const remotes = await git.getRemotes(true) // true includes URLs
   const origin = remotes.find((remote) => remote.name === upstreamName)
-  //   const originUrl = origin ? origin.refs.fetch : null // or origin.refs.push
   if (!origin?.name) {
     throw new Error(`Could not find a remote called '${upstreamName}'`)
   }
