@@ -37,8 +37,7 @@ release:
     bun run release
 
 upgrade:
-    bun update --interactive
-    bunx biome migrate --write
+    bun update --interactive --minimum-release-age=86400 && bun install
 
 docs-dev:
     bun run docs:dev
