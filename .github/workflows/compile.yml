@@ -28,4 +28,4 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: bun build src/index.ts --compile --minify --sourcemap --bytecode --target=${{ matrix.target.target }} --outfile out/${{ matrix.target.asset_name }}
-
+      - run: ls -la out
