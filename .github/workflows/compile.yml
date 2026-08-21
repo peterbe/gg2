@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        bun-version:
+          - 1.4.0
+          - 1.3.14
         target:
           - target: bun-linux-arm64
             asset_name: gg-linux-arm64
@@ -26,6 +29,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ matrix.bun-version }}
       - run: bun install
       - run: time bun build src/index.ts --compile --minify --sourcemap --bytecode --target=${{ matrix.target.target }} --outfile out/${{ matrix.target.asset_name }}
       - name: inspect build size
