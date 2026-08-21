@@ -22,8 +22,8 @@
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.12",
-    "@types/bun": "1.3.12",
+    "@biomejs/biome": "2.5.9",
+    "@types/bun": "1.3.14",
     "husky": "^9.1.7",
     "np": "^10.3.0",
     "vitepress": "^2.0.0-alpha.16"
@@ -32,13 +32,13 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@inquirer/prompts": "^8.2.1",
+    "@inquirer/prompts": "^8.6.0",
     "commander": "^14.0.3",
     "fuzzysort": "^3.1.0",
     "kleur": "^4.1.5",
     "octokit": "^5.0.5",
     "simple-git": "^3.31.1",
-    "yocto-spinner": "^1.1.0"
+    "yocto-spinner": "^1.2.2"
   },
   "publishConfig": {
     "access": "public"
