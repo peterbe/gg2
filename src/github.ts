@@ -75,9 +75,11 @@ async function testToken(token: string, options: TokenOptions): Promise<void> {
 
 type PROptions = {
   watch?: boolean
+  yes?: boolean
 }
 
 export async function gitHubPR(options: PROptions) {
+  const yes = Boolean(options.yes)
   let watch = Boolean(options.watch)
   const git = simpleGit()
   const currentBranch = await getCurrentBranch(git)
@@ -110,7 +112,7 @@ export async function gitHubPR(options: PROptions) {
   if (prDetails.mergeable_state === "behind") {
     await isBehind({ git, defaultBranch, currentBranch })
   } else if (prDetails.state === "closed" && prDetails.merged) {
-    await getBack({ git, defaultBranch, currentBranch })
+    await getBack({ git, defaultBranch, currentBranch, yes })
     watch = false
   } else if (prDetails.auto_merge) {
     success("Can auto-merge!")
@@ -198,10 +200,12 @@ async function getBack({
   git,
   defaultBranch,
   currentBranch,
+  yes,
 }: {
   git: SimpleGit
   defaultBranch: string
   currentBranch: string
+  yes?: boolean
 }) {
   const status = await git.status()
   if (!status.isClean()) {
@@ -209,10 +213,12 @@ async function getBack({
   }
 
   success("PR has been merged!")
-  const goBack = await confirm({
-    message: `Go back to branch ${kleur.italic(defaultBranch)} and clean this branch up?`,
-    default: true,
-  })
+  const goBack =
+    yes ??
+    (await confirm({
+      message: `Go back to branch ${kleur.italic(defaultBranch)} and clean this branch up?`,
+      default: true,
+    }))
   if (goBack) {
     await git.checkout(defaultBranch)
 
