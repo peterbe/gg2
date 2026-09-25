@@ -214,7 +214,7 @@ async function getBack({
 
   success("PR has been merged!")
   const goBack =
-    yes ??
+    yes ||
     (await confirm({
       message: `Go back to branch ${kleur.italic(defaultBranch)} and clean this branch up?`,
       default: true,
