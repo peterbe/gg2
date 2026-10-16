@@ -22,10 +22,10 @@
     "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
-    "@types/bun": "1.4.2",
+    "@biomejs/biome": "2.5.15",
+    "@types/bun": "1.4.3",
     "husky": "^9.1.7",
-    "np": "^10.3.0",
+    "np": "^12.1.1",
     "vitepress": "^2.0.0-alpha.16"
   },
   "peerDependencies": {
