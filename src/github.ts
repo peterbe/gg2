@@ -105,11 +105,12 @@ export async function gitHubPR(options: PROptions) {
   const prDetails = await getPRDetailsByNumber(pr.number)
 
   console.log(kleur.bold(`PR Title: ${prDetails.title}`))
+  console.log(prDetails)
   const { message, canMerge, hasWarning } = interpretMergeableStatus(prDetails)
   if (canMerge && !hasWarning) success(message)
   else warn(message)
 
-  if (prDetails.mergeable_state === "behind") {
+  if (prDetails.mergeable_state === "behind" && !prDetails.merged) {
     await isBehind({ git, defaultBranch, currentBranch })
   } else if (prDetails.state === "closed" && prDetails.merged) {
     await getBack({ git, defaultBranch, currentBranch, yes })
